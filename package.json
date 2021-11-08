@@ -1,0 +1,23 @@
+{
+  "name": "dragonboatapp",
+  "version": "1.0.0",
+  "description": "An application to help with booking for training and loading the dragon boat.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CallumGilly/DragonBoatApp.git"
+  },
+  "keywords": [
+    "Dragon",
+    "Boat"
+  ],
+  "author": "Callum Gilchrist",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CallumGilly/DragonBoatApp/issues"
+  },
+  "homepage": "https://github.com/CallumGilly/DragonBoatApp#readme"
+}
