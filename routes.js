@@ -44,5 +44,11 @@ router.get(`/`, (req,res) => {
     });
 })
 
+// Serve the Login Page
+
+router.get(`/login`, (req,res) => {
+    res.render(`login`, {data: undefined});
+});
+
 //Export the router
 module.exports = router;
