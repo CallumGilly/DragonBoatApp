@@ -1,5 +1,15 @@
 <%- include('header') -%>
 
-    <h1>Dragon Boating</h1>
+    <% if (data.teamName != undefined) { %>   
+       <h1><%=data.teamName%></h1>
+    <% } else { %>
+        <h1>Dragon Boating</h1>
+    <% } %> 
+    
+    <% if (data.Description != undefined) { %>
+        <P><%= data.Description %> </P>
+    <% } else { %>
+        <P>This application is used to help with the booking and boat loading within dragon boating.</P>
+    <% } %>
 
 <%- include('footer') -%> 
