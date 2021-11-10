@@ -3,6 +3,7 @@ const express = require(`express`);
 const mysql = require(`mysql`);
 const dotenv = require(`dotenv`).config();
 const crypto = require(`crypto`);
+const e = require("express");
 
 //Create a router object
 const router = express.Router()
@@ -49,6 +50,34 @@ router.get(`/`, (req,res) => {
 router.get(`/login`, (req,res) => {
     res.render(`login`, {data: undefined});
 });
+
+// Handle login requests
+//http://expressjs.com/en/api.html#res.cookie
+router.post(`/login`, (req,res) => {
+    //The statement to be used to query the database
+    let sqlStatement = `SELECT username FROM paddlertable WHERE username=? AND password = ?;`
+
+    //Query the database with the defined statement
+    db.query(sqlStatement,[req.body.username, hash(req.body.password)], (err,result) => {
+        if (err) {
+            throw err
+        }
+        //Confirm that the results aren't null
+        if (result[0] != undefined) {
+            if (result[0].remember = `yes`) {
+                res.cookie(`username`, username, {expires: (new Data(Date.now() + 256)), signed: true}).redirect(`/members`);
+            } else {
+                res.cookie(`username`, username, {expires: 0, signed: true}).redirect(`/members`)
+            }
+        }else {
+            res.render(`login`, {data: {error: `Wrong password`}});
+        }
+    });
+});
+
+function hash(password) {
+    return crypto.createHash('sha256').update(password).digest('hex')
+}
 
 //Export the router
 module.exports = router;

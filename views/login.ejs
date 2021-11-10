@@ -1,13 +1,37 @@
 <%- include('header') -%>
-
-    <form>
-        <label class="form-label" for="username">Username:</label>
-        <input class="form-control" name="username" id="username" placeholder="Enter Username" type="text" size="45">
-        <label class="form-label" for="password">Password:</label>
-        <input class="form-control" name="password" id="password" placeholder="Enter Password" type="password" size="45">
-        <label class="form-label" for="remember">Remember Me</label>
-        <input class="form-control" name="remember" id="remember" type="checkbox">
-        <button class="" type="submit">Submit</button>
-    </form>
+    <% if (data.error != undefined) { %>
+        <!-- Toast by W3Schools Bootstrap then modified -->
+        <div class="toast show">
+            <div class="toast-header .text-warning">
+              Error
+              <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+              <%=data.error%>
+            </div>
+          </div>
+    <% } %>
+    <!-- Bootstrap learned from https://www.w3schools.com/bootstrap5/bootstrap_forms.php -->
+    <div class="card">
+        <div class="card-body">
+            <form method="post" action="/login">
+                <div class="mb-3 mt-3">
+                    <label class="form-label" for="username">Username:</label>
+                    <input class="form-control" name="username" id="username" placeholder="Enter Username" type="text" size="20">
+                </div>
+                <div class="mb-3 mt-3">
+                    <label class="form-label" for="password">Password:</label>
+                    <input class="form-control" name="password" id="password" placeholder="Enter Password" type="password" size="20">
+                </div>
+                <div class="form-check mb-3>
+                    <label class="form-check-label" for="remember">Remember Me</label>
+                    <input class="form-check-input" name="remember" id="remember" type="checkbox">
+                </div>
+                <div>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
 
 <%- include('footer') -%> 
