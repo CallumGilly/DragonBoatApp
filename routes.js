@@ -3,7 +3,6 @@ const express = require(`express`);
 const mysql = require(`mysql`);
 const dotenv = require(`dotenv`).config();
 const crypto = require(`crypto`);
-const e = require("express");
 
 //Create a router object
 const router = express.Router()
@@ -55,27 +54,54 @@ router.get(`/login`, (req,res) => {
 //http://expressjs.com/en/api.html#res.cookie
 router.post(`/login`, (req,res) => {
     //The statement to be used to query the database
+    let username = req.body.username.toLowerCase();
     let sqlStatement = `SELECT username FROM paddlertable WHERE username=? AND password = ?;`
 
     //Query the database with the defined statement
-    db.query(sqlStatement,[req.body.username, hash(req.body.password)], (err,result) => {
+    db.query(sqlStatement,[username, hash(req.body.password)], (err,result) => {
         if (err) {
             throw err
         }
         //Confirm that the results aren't null
         if (result[0] != undefined) {
             if (result[0].remember = `yes`) {
-                res.cookie(`username`, username, {expires: (new Data(Date.now() + 256)), signed: true}).redirect(`/members`);
+                //Return a 1 month cookie if user wants to be remembered then render the member area
+                res.cookie(`username`, username, {maxAge: 1000 * 60 * 60 * 24 * 12, signed:true}).redirect(`/members`);
             } else {
-                res.cookie(`username`, username, {expires: 0, signed: true}).redirect(`/members`)
+                //Return a session cookie when the user doesn't want to be remembered then render the member area
+                res.cookie(`username`, username, {expires: 0, signed:true}).redirect(`/members`);
+                
             }
         }else {
-            res.render(`login`, {data: {error: `Wrong password`}});
+            //Render the login page if the user is not found
+            res.render(`login`, {data: {error: `User not found`}});
         }
     });
 });
 
-function hash(password) {
+router.get(`/members`, (req,res) => {
+    //Define sql statement to be used
+    let sqlStatement = `SELECT * FROM paddlertable WHERE username=?`
+    
+    //Query the database
+    db.query(sqlStatement,[req.signedCookies.username], (err,result) => {
+        //Throw an error if one occurs
+        if(err) {
+            throw err;
+        }
+
+        //Check to see if the user is in the database
+        if (result[0] != undefined) {
+            //Render the members area
+            res.render(`members`, {data: {fname: result[0].firstName}})
+        } else {
+            // If the user is not in the database then clear cookies and make them login again
+            res.clearCookie(`username`).render(`login`, {data: {error: `Data information not found, please log in again`}});
+        }
+    });
+});
+
+function hash(password) { // Hash any parsed passwords - helper function to save me from long strings to hash passwords
     return crypto.createHash('sha256').update(password).digest('hex')
 }
 

@@ -4,6 +4,7 @@
 const express = require(`express`);
 const ejs = require(`ejs`);
 const cookieParser = require(`cookie-parser`);
+const dotenv = require(`dotenv`).config();
 
 //Import homemade modules
 const routes = require(`./routes`);
@@ -22,8 +23,8 @@ app.set(`view engine`, `ejs`);
 app.use(express.urlencoded({extended: true}));
 app.use(express.json());
 
-//Allow the sever to parse cookies
-app.use(cookieParser());
+//Allow the sever to parse cookies and set the secret
+app.use(cookieParser(process.env.COOKIE_SECRET));
 
 //Forward requests made to / to the routes module
 app.use(`/`, routes);

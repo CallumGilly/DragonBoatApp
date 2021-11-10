@@ -1,15 +1,17 @@
 <%- include('header') -%>
-    <% if (data.error != undefined) { %>
+    <% if (data != undefined) { %>
+        <% if (data.error != undefined) { %>
         <!-- Toast by W3Schools Bootstrap then modified -->
         <div class="toast show">
             <div class="toast-header .text-warning">
-              Error
-              <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                Error
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
             </div>
             <div class="toast-body">
-              <%=data.error%>
+                <%=data.error%>
             </div>
-          </div>
+        </div>
+        <% } %>
     <% } %>
     <!-- Bootstrap learned from https://www.w3schools.com/bootstrap5/bootstrap_forms.php -->
     <div class="card">
