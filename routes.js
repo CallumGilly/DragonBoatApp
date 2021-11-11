@@ -48,31 +48,50 @@ router.get(`/`, (req,res) => {
 // Serve the Login Page
 
 router.get(`/login`, (req,res) => {
-    res.render(`login`, {data: undefined});
+    //Check if user has a valid cookie
+    checkUsernameCookie(req.signedCookies.username, (cookieData) => {
+        if (cookieData.valid) {
+            // If they do redirect them without the need to login
+            res.redirect(`/members`)
+        } else {
+            //If not make them login
+            res.render(`login`, {data: undefined});
+        }
+    });
 });
 
 // Handle login requests
 //http://expressjs.com/en/api.html#res.cookie
 router.post(`/login`, (req,res) => {
-    //The statement to be used to query the database
-    let username = req.body.username.toLowerCase();
-    let sqlStatement = `SELECT username FROM paddlertable WHERE username=? AND password = ?;`
 
-    //Query the database with the defined statement
+    //Generate the statement to be used to query the database
+    let sqlStatement = `SELECT username FROM paddlertable WHERE username=? AND password = ?;`
+    let username = req.body.username.toLowerCase();
+
+    //Query the database with the defined statement to see if the user exists
     db.query(sqlStatement,[username, hash(req.body.password)], (err,result) => {
         if (err) {
             throw err
         }
+        
         //Confirm that the results aren't null
         if (result[0] != undefined) {
-            if (result[0].remember = `yes`) {
-                //Return a 1 month cookie if user wants to be remembered then render the member area
-                res.cookie(`username`, username, {maxAge: 1000 * 60 * 60 * 24 * 12, signed:true}).redirect(`/members`);
-            } else {
-                //Return a session cookie when the user doesn't want to be remembered then render the member area
-                res.cookie(`username`, username, {expires: 0, signed:true}).redirect(`/members`);
-                
-            }
+            //Generate a random string, insert it into the cookie table with reference to the username so that the cookie can't be modified
+            let cookieSQL = `INSERT INTO cookietable (username, cookie) VALUES (?, ?)`;
+            let cookieRandValue = genRandomString(60)
+            db.query(cookieSQL,[result[0].username, cookieRandValue], (err) => {
+                if (err) {
+                    throw err;
+                }
+                if (result[0].remember = `yes`) {
+                    //Return a 1 month cookie if user wants to be remembered then render the member area
+                    res.cookie(`username`, cookieRandValue, {maxAge: 1000 * 60 * 60 * 24 * 30, signed:true}).redirect(`/members`);
+                } else {
+                    //Return a session cookie when the user doesn't want to be remembered then render the member area
+                    res.cookie(`username`, cookieRandValue, {expires: 0, signed:true}).redirect(`/members`);
+                    
+                }
+            });
         }else {
             //Render the login page if the user is not found
             res.render(`login`, {data: {error: `User not found`}});
@@ -80,23 +99,32 @@ router.post(`/login`, (req,res) => {
     });
 });
 
+//Handle member area requests
 router.get(`/members`, (req,res) => {
-    let usernameCookie = req.signedCookies.username;
-    checkUsernameCookie(usernameCookie, (cookieData) => {
-        console.log(cookieData);
+    checkUsernameCookie(req.signedCookies.username, (cookieData) => {
         if (cookieData.valid) {
-            //Render the members area
+            //Render the members area if the cookie is valid
             res.render(`members`, {data: {fname: cookieData.result.firstName}})
         } else {
-            // If the user is not in the database then clear cookies and make them login again
+            // If the user cookie is not in the database then clear cookies and make them login again
             res.clearCookie(`username`).render(`login`, {data: {error: `Data information not found, please log in again`}});
         }
     });
-}); 
+});
 
-function checkUsernameCookie(usernameCookie, callback) {
+
+function genRandomString(length) { //Generate a string of a set length for use with cookie generation
+    let randString = ``;
+    for (var pos = 0; pos <= length; pos++) {
+        // Append a char with an ascii code between 33 and 126
+        randString += String.fromCharCode(33 + Math.floor(Math.random() * 93))
+    }
+    return randString;
+}
+
+function checkUsernameCookie(usernameCookie, callback) { //Check if a cookie is valid
     //Define sql statement to be used
-    let sqlStatement = `SELECT * FROM paddlertable WHERE username=?`
+    let sqlStatement = `SELECT * FROM paddlertable INNER JOIN cookietable ON paddlertable.username = cookietable.username WHERE cookietable.cookie=?`
         
     //Query the database with the username cookie
     db.query(sqlStatement, [usernameCookie], (err,result) => {
