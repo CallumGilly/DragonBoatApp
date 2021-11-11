@@ -3,6 +3,7 @@ const express = require(`express`);
 const mysql = require(`mysql`);
 const dotenv = require(`dotenv`).config();
 const crypto = require(`crypto`);
+const e = require("express");
 
 //Create a router object
 const router = express.Router()
@@ -80,26 +81,38 @@ router.post(`/login`, (req,res) => {
 });
 
 router.get(`/members`, (req,res) => {
-    //Define sql statement to be used
-    let sqlStatement = `SELECT * FROM paddlertable WHERE username=?`
-    
-    //Query the database
-    db.query(sqlStatement,[req.signedCookies.username], (err,result) => {
-        //Throw an error if one occurs
-        if(err) {
-            throw err;
-        }
-
-        //Check to see if the user is in the database
-        if (result[0] != undefined) {
+    let usernameCookie = req.signedCookies.username;
+    checkUsernameCookie(usernameCookie, (cookieData) => {
+        console.log(cookieData);
+        if (cookieData.valid) {
             //Render the members area
-            res.render(`members`, {data: {fname: result[0].firstName}})
+            res.render(`members`, {data: {fname: cookieData.result.firstName}})
         } else {
             // If the user is not in the database then clear cookies and make them login again
             res.clearCookie(`username`).render(`login`, {data: {error: `Data information not found, please log in again`}});
         }
     });
-});
+}); 
+
+function checkUsernameCookie(usernameCookie, callback) {
+    //Define sql statement to be used
+    let sqlStatement = `SELECT * FROM paddlertable WHERE username=?`
+        
+    //Query the database with the username cookie
+    db.query(sqlStatement, [usernameCookie], (err,result) => {
+        //Throw an error if one occurs
+        if(err) {
+            throw err;
+        }
+
+        //Check to see if the user is in the database, return true if they are
+        if (result[0] != undefined) {
+            callback({valid: true, result: result[0]});
+        } else {
+            callback({valid: false});
+        }
+    });
+}
 
 function hash(password) { // Hash any parsed passwords - helper function to save me from long strings to hash passwords
     return crypto.createHash('sha256').update(password).digest('hex')
