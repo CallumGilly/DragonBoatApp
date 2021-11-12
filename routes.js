@@ -107,7 +107,7 @@ router.get(`/members`, (req,res) => {
             res.render(`members`, {data: {fname: cookieData.result.firstName}})
         } else {
             // If the user cookie is not in the database then clear cookies and make them login again
-            res.clearCookie(`username`).render(`login`, {data: {error: `Data information not found, please log in again`}});
+            res.clearCookie(`username`).render(`login`, {data: {error: `Signed Out`}});
         }
     });
 });

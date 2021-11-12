@@ -14,7 +14,7 @@ const app = express();
 const port = 3030;
 
 //Allow the /public directory to be accessed by anyone
-app.use(`./public`, express.static(`public`));
+app.use(`/public`, express.static(`public`));
 
 //Use EJS as the view engine to allow for template use
 app.set(`view engine`, `ejs`);

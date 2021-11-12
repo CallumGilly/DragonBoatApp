@@ -14,10 +14,11 @@
         <% } %>
     <% } %>
     <!-- Bootstrap learned from https://www.w3schools.com/bootstrap5/bootstrap_forms.php -->
-    <div class="card">
+    <div class="card mt-4 p-2">
         <div class="card-body">
             <form method="post" action="/login">
-                <div class="mb-3 mt-3">
+                <h3>Login</h3>
+                <div class="">
                     <label class="form-label" for="username">Username:</label>
                     <input class="form-control" name="username" id="username" placeholder="Enter Username" type="text" size="20">
                 </div>
@@ -35,5 +36,4 @@
             </form>
         </div>
     </div>
-
 <%- include('footer') -%> 
