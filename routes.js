@@ -4,6 +4,7 @@ const mysql = require(`mysql`);
 const dotenv = require(`dotenv`).config();
 const crypto = require(`crypto`);
 const e = require("express");
+const { threadId } = require("worker_threads");
 
 //Create a router object
 const router = express.Router()
@@ -112,12 +113,73 @@ router.get(`/members`, (req,res) => {
     });
 });
 
+router.get(`/errorpage`, (req,res) => {
+    res.render(`errorpage`, {errorList: {errorCode: 418, Description: `I am a teapot, also, Why did you come here?`}});
+});
 
-function genRandomString(length) { //Generate a string of a set length for use with cookie generation
+//Handle signup requests
+router.get(`/signup`, (req,res) => {
+    //Get the ID from the URL
+    let linkID = req.query.id;
+
+    //Parse the link ID to the linkID checker
+    signupCheck(linkID, (valid, result) => {
+        if (valid) {
+            //If the link is valid send the user the signup page.
+            res.render(`signup`, {data: {creator: result.firstName + ` ` + result.lastName}});
+        } else {
+            //If invalid send the user to the error page
+            res.render(`errorpage`, {errorList: {errorCode: 410, Description: `The link provided is no longer valid, Sorry`}});
+        } 
+    });
+});
+
+//Check if a signup link is valid
+function signupCheck(linkID, callback) {
+    
+    //Make a request to the database to collect all data about it
+    let sqlStatement = `SELECT signupLinks.linkID, signupLinks.maxUses, signupLinks.expiration, paddlertable.firstName, paddlertable.lastName FROM signuplinks INNER JOIN paddlertable ON signuplinks.creator = paddlertable.username WHERE linkID = ?;`
+    db.query(sqlStatement, [linkID], (err, result) => {
+        if (err) {
+            throw err;
+        }
+
+        //Create a flag to be set to false if the link is invalid
+        let validLinkFlag = false;
+        if (result[0] != undefined) {
+            validLinkFlag = true;
+            
+            // If an expiration exists then check it is in the future, if not invalid
+            if (result[0].expiration != null) {
+                if (result[0].expiration < Date.now()) {
+                    validLinkFlag = false;
+                }
+            }
+
+            // If an maxUses exists then check it is not 0, if it is invalid
+            if (result[0].maxUses != null) {
+                if (result[0].maxUses == 0) {
+                    validLinkFlag = false;
+                }
+                //Decrease the max uses by one if not null
+                let decreaseStatement = `UPDATE signupLinks SET maxUses=? WHERE linkID=?;`;
+                db.query(decreaseStatement,[result[0].maxUses - 1, result[0].linkID], (err) => {
+                    if (err) {
+                        throw err;
+                    }
+                });
+            }
+        }
+        callback(validLinkFlag, result[0]);
+    });
+}
+
+// console.log(genRandomString(30,97));
+function genRandomString(length, minNum = 33) { //Generate a string of a set length for use with cookie generation and signup link generation
     let randString = ``;
     for (var pos = 0; pos <= length; pos++) {
         // Append a char with an ascii code between 33 and 126
-        randString += String.fromCharCode(33 + Math.floor(Math.random() * 93))
+        randString += String.fromCharCode(minNum + Math.floor(Math.random() * (126 - minNum)));
     }
     return randString;
 }
