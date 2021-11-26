@@ -1,4 +1,65 @@
 <%- include('header') -%>
-    <h1>Sign Up</h1>
-    <p> <%=data.creator%> has invited you to the hurricane's dragon boat app</p>
+    
+    
+    <div class="card mt-4 p-2">
+        <div class="card-body">
+            <form method="post" action="/signup" id="signupForm">
+                <h1>Sign Up</h1>
+                <p> <%=data.creator%> has invited you to the hurricane's dragon boat app. Please fill in all fields marked with an asterisk</p>
+                <div class="mb-3 mt-3">
+                    <div class="required-field"><label class="form-label" for="username">Username:</label></div>
+                    <input class="form-control required-field" name="username" id="username" placeholder="Enter Username" type="text" size="20">
+                </div>
+                <div class="mb-3 mt-3">
+                    <div class="required-field"><label class="form-label" for="password">Password:</label></div>
+                    <input class="form-control" name="password" id="password" placeholder="Enter Password" type="password" size="20">
+                </div>
+                <div class="mb-3 mt-3">
+                    <div class="required-field"><label class="form-label" for="passwordConfirmation">Confirm your password:</label></div>
+                    <input class="form-control" name="passwordConfirmation" id="passwordConfirmation" placeholder="Enter Password Again" type="password" size="20">
+                </div>
+                <div class="required-field"><label class="form-label" for="firstName">Your Name:</label></div>
+                <div class="input-group">
+                    <input class="form-control required-field" name="firstName" id="firstName" placeholder="Enter First name" type="text" size="20">
+                    <input class="form-control required-field" name="lastName" id="lastName" placeholder="Enter Last name" type="text" size="20">
+                </div>
+
+                <div class="mb-3 mt-3">
+                    <label for="gender">Please Select your gender</label>
+                    <select class="form-select form-control" name="gender" id="gender">
+                        <option value="1">Male</option>
+                        <option value="2">Female</option>
+                        <option value="0">Other</option>
+                        <option value="9" selected>Prefer Not To Say</option>
+                    </select>
+                </div>
+
+                <div class="mb-3 mt-3">
+                    <label for="weight">Weight:</label>
+                    <div class="input-group">
+                        <div class="input-group-text">
+                            <input type="checkbox" id="inputWeightNow" name="inputWeightNow" onchange="document.getElementById(`weight`).readOnly = !document.getElementById(`weight`).readOnly">
+                        </div>
+                        <input class="form-control" type="number" id="weight" name="weight" readonly="true">
+                        <span class="input-group-text">Kg</span>
+                    </div>
+                </div>
+
+                <div class="mb-3 mt-3">
+                    <label for="MembershipNumber">BDA Membership Information:</label>
+                    <div class="input-group">
+                        <div class="input-group-text">
+                            <input type="checkbox" id="inputWeightNow" name="inputMembershipNumberNow" onchange="toggleMembership()">
+                        </div>
+                        <input class="form-control" type="number" id="MembershipNumber" name="MembershipNumber" placeholder="Membership Number" readonly="true">
+                        <input class="form-control" type="date" id="MembershipExpiration" name="MembershipExpiration" placeholder="Expiration" alt="Expiration Date" readonly="true">
+                    </div>
+                </div>
+
+                <div>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
 <%- include('footer') -%> 

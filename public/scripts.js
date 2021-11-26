@@ -13,3 +13,8 @@ function signOut() {
     // Delete cookies if the sign out button is pressed
     document.cookie = "username=;expires=" + new Date(0).toUTCString();
 }
+
+function toggleMembership() {
+    document.getElementById(`MembershipNumber`).readOnly = !document.getElementById(`MembershipNumber`).readOnly;
+    document.getElementById(`MembershipExpiration`).readOnly = !document.getElementById(`MembershipExpiration`).readOnly;
+}
