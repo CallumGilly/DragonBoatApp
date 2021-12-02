@@ -123,7 +123,7 @@ router.get(`/signup`, (req,res) => {
     let linkID = req.query.id;
 
     //Parse the link ID to the linkID checker
-    signupCheck(linkID, (valid, result) => {
+    signupCheck(linkID, false,(valid, result,) => {
         if (valid) {
             //If the link is valid send the user the signup page.
             res.render(`signup`, {data: {creator: result.firstName + ` ` + result.lastName}});
@@ -140,7 +140,7 @@ router.post(`/signup`, (req,res) => {
 });
 
 //Check if a signup link is valid
-function signupCheck(linkID, callback) {
+function signupCheck(linkID, updateFlag, callback) {
     
     //Make a request to the database to collect all data about it
     let sqlStatement = `SELECT signupLinks.linkID, signupLinks.maxUses, signupLinks.expiration, paddlertable.firstName, paddlertable.lastName FROM signuplinks INNER JOIN paddlertable ON signuplinks.creator = paddlertable.username WHERE linkID = ?;`
@@ -166,13 +166,15 @@ function signupCheck(linkID, callback) {
                 if (result[0].maxUses == 0) {
                     validLinkFlag = false;
                 }
-                //Decrease the max uses by one if not null
-                let decreaseStatement = `UPDATE signupLinks SET maxUses=? WHERE linkID=?;`;
-                db.query(decreaseStatement,[result[0].maxUses - 1, result[0].linkID], (err) => {
-                    if (err) {
-                        throw err;
-                    }
-                });
+                //Decrease the max uses by one if not null and a update request is made
+                if (updateFlag == true) {
+                    let decreaseStatement = `UPDATE signupLinks SET maxUses=? WHERE linkID=?;`;
+                    db.query(decreaseStatement,[result[0].maxUses - 1, result[0].linkID], (err) => {
+                        if (err) {
+                            throw err;
+                        }
+                    });
+                }
             }
         }
         callback(validLinkFlag, result[0]);
