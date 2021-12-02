@@ -3,25 +3,25 @@
     
     <div class="card mt-4 p-2">
         <div class="card-body">
-            <form method="post" action="/signup" id="signupForm">
+            <form method="post" action="/signup" id="signupForm" onsubmit="return validateSignup()">
                 <h1>Sign Up</h1>
                 <p> <%=data.creator%> has invited you to the hurricane's dragon boat app. Please fill in all fields marked with an asterisk</p>
                 <div class="mb-3 mt-3">
                     <div class="required-field"><label class="form-label" for="username">Username:</label></div>
-                    <input class="form-control required-field" name="username" id="username" placeholder="Enter Username" type="text" size="20">
+                    <input class="form-control required-field" name="username" id="username" placeholder="Create your Username" type="text" size="20" required="true">
                 </div>
                 <div class="mb-3 mt-3">
                     <div class="required-field"><label class="form-label" for="password">Password:</label></div>
-                    <input class="form-control" name="password" id="password" placeholder="Enter Password" type="password" size="20">
+                    <input class="form-control" name="password" id="password" placeholder="Enter Password" type="password" size="20" required="true">
                 </div>
                 <div class="mb-3 mt-3">
                     <div class="required-field"><label class="form-label" for="passwordConfirmation">Confirm your password:</label></div>
-                    <input class="form-control" name="passwordConfirmation" id="passwordConfirmation" placeholder="Enter Password Again" type="password" size="20">
+                    <input class="form-control" name="passwordConfirmation" id="passwordConfirmation" placeholder="Enter Password Again" type="password" size="20" required="true">
                 </div>
                 <div class="required-field"><label class="form-label" for="firstName">Your Name:</label></div>
                 <div class="input-group">
-                    <input class="form-control required-field" name="firstName" id="firstName" placeholder="Enter First name" type="text" size="20">
-                    <input class="form-control required-field" name="lastName" id="lastName" placeholder="Enter Last name" type="text" size="20">
+                    <input class="form-control required-field" name="firstName" id="firstName" placeholder="Enter First name" type="text" size="20" required="true">
+                    <input class="form-control required-field" name="lastName" id="lastName" placeholder="Enter Last name" type="text" size="20" required="true">
                 </div>
 
                 <div class="mb-3 mt-3">

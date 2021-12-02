@@ -18,3 +18,8 @@ function toggleMembership() {
     document.getElementById(`MembershipNumber`).readOnly = !document.getElementById(`MembershipNumber`).readOnly;
     document.getElementById(`MembershipExpiration`).readOnly = !document.getElementById(`MembershipExpiration`).readOnly;
 }
+
+function validateSignup() {
+    if (document.getElementById(`password`).value !== document.getElementById(`password`).value) {return false;}
+    return true;
+}

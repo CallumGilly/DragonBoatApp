@@ -134,6 +134,11 @@ router.get(`/signup`, (req,res) => {
     });
 });
 
+router.post(`/signup`, (req,res) => {
+    let signupData = req.body;
+    res.render(`login`, {data: {message: "Account Created"}})
+});
+
 //Check if a signup link is valid
 function signupCheck(linkID, callback) {
     
