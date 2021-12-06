@@ -1,5 +1,18 @@
 <%- include('header') -%>
-    
+    <% if (data != undefined) { %>
+        <% if (data.message != undefined) { %>
+            <!-- Toast by W3Schools Bootstrap then modified -->
+            <div class="toast show">
+                <div class="toast-header .text-warning">
+                    Sever Message:
+                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    <%=data.message%>
+                </div>
+            </div>
+            <% } %>
+    <% } %>
     
     <div class="card mt-4 p-2">
         <div class="card-body">
@@ -8,15 +21,15 @@
                 <p> <%=data.creator%> has invited you to the hurricane's dragon boat app. Please fill in all fields marked with an asterisk</p>
                 <div class="mb-3 mt-3">
                     <div class="required-field"><label class="form-label" for="username">Username:</label></div>
-                    <input class="form-control required-field" name="username" id="username" placeholder="Create your Username" type="text" size="20" required="true">
+                    <input class="form-control required-field" name="username" id="username" placeholder="Create your Username" type="text" size="20" required="true" minlength="8">
                 </div>
                 <div class="mb-3 mt-3">
                     <div class="required-field"><label class="form-label" for="password">Password:</label></div>
-                    <input class="form-control" name="password" id="password" placeholder="Enter Password" type="password" size="20" required="true">
+                    <input class="form-control" name="password" id="password" placeholder="Enter Password" type="password" size="20" required="true" minlength="8" maxlength="20" pattern="^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&-+=()])(?=\\S+$).{8, 20}$">
                 </div>
                 <div class="mb-3 mt-3">
                     <div class="required-field"><label class="form-label" for="passwordConfirmation">Confirm your password:</label></div>
-                    <input class="form-control" name="passwordConfirmation" id="passwordConfirmation" placeholder="Enter Password Again" type="password" size="20" required="true">
+                    <input class="form-control" name="passwordConfirmation" id="passwordConfirmation" placeholder="Enter Password Again" type="password" size="20" required="true" minlength="8" maxlength="20">
                 </div>
                 <div class="required-field"><label class="form-label" for="firstName">Your Name:</label></div>
                 <div class="input-group">
@@ -38,7 +51,7 @@
                     <label for="weight">Weight:</label>
                     <div class="input-group">
                         <div class="input-group-text">
-                            <input type="checkbox" id="inputWeightNow" name="inputWeightNow" onchange="document.getElementById(`weight`).readOnly = !document.getElementById(`weight`).readOnly">
+                            <input type="checkbox" id="inputWeightNow" name="inputWeightNow" onchange="toggleWeight()">
                         </div>
                         <input class="form-control" type="number" id="weight" name="weight" readonly="true">
                         <span class="input-group-text">Kg</span>
