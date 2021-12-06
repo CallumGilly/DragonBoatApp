@@ -1,0 +1,14 @@
+<%- include('header') -%>
+    <% if (errorList.errorCode != undefined) { %>   
+       <h1><%=errorList.errorCode%></h1>
+    <% } else { %>
+        <h1>An error has occurred</h1>
+    <% } %> 
+    
+    <% if (errorList.Description != undefined) { %>
+        <P><%= errorList.Description %> </P>
+    <% } else { %>
+        <P>An undefined error has occurred and you have been redirected to this page</P>
+    <% } %>
+    <a href="/">Return to homepage</a>
+<%- include('footer') -%> 

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Nov 11, 2021 at 10:56 PM
+-- Generation Time: Nov 17, 2021 at 04:03 PM
 -- Server version: 10.4.21-MariaDB
--- PHP Version: 7.4.24
+-- PHP Version: 7.3.31
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -95,7 +95,8 @@ CREATE TABLE `cookietable` (
 --
 
 INSERT INTO `cookietable` (`username`, `cookie`, `dateMade`) VALUES
-('cwjg21', ':II50yCJw\'tA}VQ0H)sC[I4$Q:m1[x#}\'QtPL[:<_xcq#s>ao7,wtaOfCQ^/!', '2021-11-11');
+('cwjg21', ':II50yCJw\'tA}VQ0H)sC[I4$Q:m1[x#}\'QtPL[:<_xcq#s>ao7,wtaOfCQ^/!', '2021-11-11'),
+('cwjg21', 'DxC<3UZQ0Z4w6n0&{Wr62Mj:I<6!m=xIR\"HpMTtt9bEwG6{xI)o{QAT)w]#WH', '2021-11-15');
 
 -- --------------------------------------------------------
 
@@ -157,6 +158,28 @@ CREATE TABLE `sessiontable` (
   `sessionDate` datetime NOT NULL,
   `Description` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `signuplinks`
+--
+
+CREATE TABLE `signuplinks` (
+  `linkID` varchar(255) NOT NULL,
+  `creator` varchar(255) NOT NULL,
+  `maxUses` int(11) DEFAULT NULL,
+  `expiration` date DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `signuplinks`
+--
+
+INSERT INTO `signuplinks` (`linkID`, `creator`, `maxUses`, `expiration`) VALUES
+('averyrealSignUpLink', 'cwjg21', NULL, NULL),
+('linkwithExpiration', 'cwjg21', NULL, '2021-11-16'),
+('linkWithMaxUses', 'cwjg21', -1, NULL);
 
 -- --------------------------------------------------------
 
@@ -250,6 +273,13 @@ ALTER TABLE `sessiontable`
   ADD PRIMARY KEY (`sessionID`);
 
 --
+-- Indexes for table `signuplinks`
+--
+ALTER TABLE `signuplinks`
+  ADD PRIMARY KEY (`linkID`),
+  ADD KEY `creator` (`creator`);
+
+--
 -- Indexes for table `team`
 --
 ALTER TABLE `team`
@@ -320,6 +350,12 @@ ALTER TABLE `medicaltable`
 ALTER TABLE `sessionlink`
   ADD CONSTRAINT `sessionlink_ibfk_1` FOREIGN KEY (`username`) REFERENCES `paddlertable` (`username`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `sessionlink_ibfk_2` FOREIGN KEY (`sessionID`) REFERENCES `sessiontable` (`sessionID`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Constraints for table `signuplinks`
+--
+ALTER TABLE `signuplinks`
+  ADD CONSTRAINT `signuplinks_ibfk_1` FOREIGN KEY (`creator`) REFERENCES `paddlertable` (`username`) ON DELETE CASCADE ON UPDATE CASCADE;
 
 --
 -- Constraints for table `teamlink`

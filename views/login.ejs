@@ -12,6 +12,18 @@
             </div>
         </div>
         <% } %>
+        <% if (data.message != undefined) { %>
+            <!-- Toast by W3Schools Bootstrap then modified -->
+            <div class="toast show">
+                <div class="toast-header .text-warning">
+                    Sever Message:
+                    <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+                </div>
+                <div class="toast-body">
+                    <%=data.message%>
+                </div>
+            </div>
+            <% } %>
     <% } %>
     <!-- Bootstrap learned from https://www.w3schools.com/bootstrap5/bootstrap_forms.php -->
     <div class="card mt-4 p-2">
