@@ -8,7 +8,8 @@ class person {
         this.gender = gender;
         this.perf =  pref;
         this.weight =  weight;
-        this.locked = false;
+        this.lockedSide = false;
+        this.lockedRow = false;
     }
 
     valid () {
