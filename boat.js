@@ -111,15 +111,169 @@ class boat {
         return position;
     }
 
-    //Used to lock a user into a specific seat whe
+    //Used to lock a user into a specific seat. Pos coded so that pos < 0 its on the right and pos = (pos * -1) -1
     setSeat(username, newPos, lockedSide = true) {
-        let position = this.getUserPos(username)
-        let activeArray;
-        if (position < 0) {
-            position = (position * -1) - 1;
-            activeArray = this.right;
+        let currentPosition = this.getUserPos(username)
+        let currentArray;
+        if (currentPosition < 0) {
+            currentPosition = (currentPosition * -1) - 1;
+            currentArray = this.right;
         } else {
-            activeArray = this.left;
+            currentArray = this.left;
+        }
+        let newArray;
+        let theNewPos
+        if (newPos < 0) {
+            theNewPos = (newPos * -1) - 1;
+            newArray = this.right;
+        } else {
+            theNewPos = newPos;
+            newArray = this.left;
+        }
+        let tempPaddler = currentArray[currentPosition];
+        currentArray[currentPosition] = newArray[theNewPos];
+        newArray[theNewPos] = tempPaddler;
+        newArray[theNewPos].lockedSide = lockedSide;
+        newArray[theNewPos].lockedRow = true;
+    }
+
+    optimisePortStarboardValidSwap(pad1,pad2) {
+        if (pad1 === null) {
+            if(pad2 === null) {
+                return false;
+            } else if (pad2.lockedSide == true) {
+                return false;
+            }
+        } else if (pad1.lockedSide == true)  {
+            return false;            
+        } else if(pad2 === null) {
+            return true;
+        } else if (pad2.lockedSide == true) {
+            return false;
+        }
+        return true;
+    }
+
+    //Change the side of the boat until it is
+    optimisePortStarboard(followPreferences=true) {
+        //If negative back heavy/ right heavy
+        const initialMoment = this.PortStarboardMoment();
+
+        let bestMoment = Math.abs(initialMoment);
+        let bestLeft = -1;
+        let bestRight = -1;
+        for (var row = 0; row < 10; row++) {
+            //if should be !F + FV Which vir absorption is !F + V where v is the valid check
+            //Only swap if not lockedside of not following preference
+            if (!followPreferences || this.optimisePortStarboardValidSwap(this.left[row],this.right[row])) {
+                let tempValue = this.left[row];
+                this.left[row] = this.right[row];
+                this.right[row] = tempValue;
+                var moment = Math.abs(this.PortStarboardMoment());
+                if (moment < bestMoment) {
+                    bestMoment = moment;
+                    bestLeft = row;
+                    bestRight = row;
+                }
+                tempValue = this.left[row];
+                this.left[row] = this.right[row];
+                this.right[row] = tempValue;
+            }            
+        }
+        if (bestLeft !== -1) {
+            let tempValue = this.left[bestLeft];
+            this.left[bestLeft] = this.right[bestRight];
+            this.right[bestRight] = tempValue;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    fineOptimiseBowStern() {
+        //If negative back heavy/ right heavy
+        const initialMoment = this.BowSternMoment();
+        let bestMoment = Math.abs(initialMoment);
+        //Sides, pos1, pos2 sides in form: 1 = LeftLeft, 2 = LeftRight, 3 = RightLeft, 4 = RightRight
+        let best = [-1,-1,-1];
+        for (var row = 1; row < 10; row++) {
+            let tempValue = this.left[row];
+            this.left[row] = this.left[row - 1];
+            this.left[row - 1] = tempValue;
+            var moment = Math.abs(this.BowSternMoment());
+            if (moment < bestMoment) {
+                bestMoment = moment;
+                best = [1,row,row-1]
+            }
+            tempValue = this.left[row];
+            this.left[row] = this.left[row - 1];
+            this.left[row - 1] = tempValue;
+
+            tempValue = this.left[row];
+            this.left[row] = this.right[row - 1];
+            this.right[row - 1] = tempValue;
+            moment = Math.abs(this.BowSternMoment());
+            if (moment < bestMoment) {
+                bestMoment = moment;
+                best = [2,row,row-1]
+            }
+            tempValue = this.left[row];
+            this.left[row] = this.right[row - 1];
+            this.right[row - 1] = tempValue;
+            
+            tempValue = this.right[row];
+            this.right[row] = this.left[row - 1];
+            this.left[row - 1] = tempValue;
+            moment = Math.abs(this.BowSternMoment());
+            if (moment < bestMoment) {
+                bestMoment = moment;
+                best = [3,row,row-1]
+            }
+            tempValue = this.right[row];
+            this.right[row] = this.left[row - 1];
+            this.left[row - 1] = tempValue;
+
+            tempValue = this.right[row];
+            this.right[row] = this.right[row - 1];
+            this.right[row - 1] = tempValue;
+            moment = Math.abs(this.BowSternMoment());
+            if (moment < bestMoment) {
+                bestMoment = moment;
+                best = [4,row,row-1]
+            }
+            tempValue = this.right[row];
+            this.right[row] = this.right[row - 1];
+            this.right[row - 1] = tempValue;
+
+        }
+        if (best !== [-1,-1,-1]) {
+            switch (best[0]) {
+                case 1:
+                    var tempValue = this.left[best[1]];
+                    this.left[best[1]] = this.left[best[2]];
+                    this.left[best[2]] = tempValue;
+                    break;
+                case 2:
+                    var tempValue = this.left[best[1]];
+                    this.left[best[1]] = this.right[best[2]];
+                    this.right[best[2]] = tempValue;
+                    break;
+                case 3:
+                    var tempValue = this.right[best[1]];
+                    this.right[best[1]] = this.left[best[2]];
+                    this.left[best[2]] = tempValue;
+                    break;
+                case 3:
+                    var tempValue = this.right[best[1]];
+                    this.right[best[1]] = this.right[best[2]];
+                    this.right[best[2]] = tempValue;
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        } else {
+            return false;
         }
     }
 }
