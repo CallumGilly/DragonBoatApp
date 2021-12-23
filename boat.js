@@ -18,11 +18,11 @@ class boat {
         //Create arrays to contain data about paddler position
         this.left = []
         for (var x = 0; x < this.boatSize / 2; x++) {
-            this.left[x] = null;
+            this.left[x] = new person;
         }
         this.right = []
         for (var x = 0; x < this.boatSize / 2; x++) {
-            this.right[x] = null;
+            this.right[x] = new person;
         }
         //Convert the paddler list from the database into a standardized array of person objects
         let allPaddlers = []
@@ -37,17 +37,18 @@ class boat {
         allPaddlers.forEach(paddler => {
             let notFound = true;
             for (var sideIndex = 0; sideIndex <= this.left.length / 2 && notFound; sideIndex++) {
-                if (this.left[sideIndex] === null) {
+                if (this.left[sideIndex].isNull == true) {
                     this.left[sideIndex] = paddler;
                     notFound = false;
-                } else if (this.right[sideIndex] === null) {
+                } else if (this.right[sideIndex].isNull == true) {
                     this.right[sideIndex] = paddler;
                     notFound = false;
-                } else if (this.left[this.left.length - sideIndex] === null) {
-                    this.left[this.left.length - sideIndex] = paddler;
+                    console.log(`Here ${this.left[this.left.length - sideIndex - 1]}`)
+                } else if (this.left[this.left.length - sideIndex - 1].isNull == true) {
+                    this.left[this.left.length - sideIndex - 1] = paddler;
                     notFound = false;
-                } else if (this.right[this.right.length - sideIndex] === null) {
-                    this.right[this.right.length - sideIndex] = paddler;
+                } else if (this.right[this.right.length - sideIndex - 1].isNull == true) {
+                    this.right[this.right.length - sideIndex - 1] = paddler;
                     notFound = false;
                 }
             }
@@ -246,7 +247,7 @@ class boat {
             this.right[row - 1] = tempValue;
 
         }
-        if (best !== [-1,-1,-1]) {
+        if (!this.compArrs(best, [-1,-1,-1])) {
             switch (best[0]) {
                 case 1:
                     var tempValue = this.left[best[1]];
@@ -276,6 +277,16 @@ class boat {
             return false;
         }
     }
+
+    compArrs(arr1,arr2) {
+        if (arr1.length !== arr2.length) {return false};
+        for (var index = 0; index < arr1.length; index++) {
+            if (arr1[index] !== arr2[index]) {return false;};
+        }
+        return true;
+    }
+
+
 }
 
 function sessionToBoat(sessionID) {
