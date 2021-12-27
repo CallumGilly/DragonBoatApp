@@ -191,60 +191,67 @@ class boat {
         }
     }
 
-    fineOptimiseBowStern() {
+    fineOptimiseBowStern(followPreferences=true) {
         //If negative back heavy/ right heavy
         const initialMoment = this.BowSternMoment();
         let bestMoment = Math.abs(initialMoment);
         //Sides, pos1, pos2 sides in form: 1 = LeftLeft, 2 = LeftRight, 3 = RightLeft, 4 = RightRight
         let best = [-1,-1,-1];
         for (var row = 1; row < 10; row++) {
-            let tempValue = this.left[row];
-            this.left[row] = this.left[row - 1];
+            if(!followPreferences || !this.left[row].lockedRow && !this.left[row - 1].lockedRow) {
+                let tempValue = this.left[row];
+                this.left[row] = this.left[row - 1];
+                this.left[row - 1] = tempValue;
+                var moment = Math.abs(this.BowSternMoment());
+                if (moment < bestMoment) {
+                    bestMoment = moment;
+                    best = [1,row,row-1]
+                }
+                tempValue = this.left[row];
+                this.left[row] = this.left[row - 1];
             this.left[row - 1] = tempValue;
-            var moment = Math.abs(this.BowSternMoment());
-            if (moment < bestMoment) {
-                bestMoment = moment;
-                best = [1,row,row-1]
             }
-            tempValue = this.left[row];
-            this.left[row] = this.left[row - 1];
-            this.left[row - 1] = tempValue;
 
-            tempValue = this.left[row];
-            this.left[row] = this.right[row - 1];
-            this.right[row - 1] = tempValue;
-            moment = Math.abs(this.BowSternMoment());
-            if (moment < bestMoment) {
-                bestMoment = moment;
-                best = [2,row,row-1]
+            if(!followPreferences || !this.left[row].lockedRow && !this.right[row - 1].lockedRow && !this.left[row].lockedSide && !this.right[row - 1].lockedSide) {
+                let tempValue = this.left[row];
+                this.left[row] = this.right[row - 1];
+                this.right[row - 1] = tempValue;
+                moment = Math.abs(this.BowSternMoment());
+                if (moment < bestMoment) {
+                    bestMoment = moment;
+                    best = [2,row,row-1]
+                }
+                tempValue = this.left[row];
+                this.left[row] = this.right[row - 1];
+                this.right[row - 1] = tempValue;
             }
-            tempValue = this.left[row];
-            this.left[row] = this.right[row - 1];
-            this.right[row - 1] = tempValue;
-            
-            tempValue = this.right[row];
-            this.right[row] = this.left[row - 1];
-            this.left[row - 1] = tempValue;
-            moment = Math.abs(this.BowSternMoment());
-            if (moment < bestMoment) {
-                bestMoment = moment;
-                best = [3,row,row-1]
+            if(!followPreferences || !this.right[row].lockedRow && !this.left[row - 1].lockedRow && !this.right[row].lockedSide && !this.left[row - 1].lockedSide) {
+                let tempValue = this.right[row];
+                this.right[row] = this.left[row - 1];
+                this.left[row - 1] = tempValue;
+                moment = Math.abs(this.BowSternMoment());
+                if (moment < bestMoment) {
+                    bestMoment = moment;
+                    best = [3,row,row-1]
+                }
+                tempValue = this.right[row];
+                this.right[row] = this.left[row - 1];
+                this.left[row - 1] = tempValue;
             }
-            tempValue = this.right[row];
-            this.right[row] = this.left[row - 1];
-            this.left[row - 1] = tempValue;
 
-            tempValue = this.right[row];
-            this.right[row] = this.right[row - 1];
-            this.right[row - 1] = tempValue;
-            moment = Math.abs(this.BowSternMoment());
-            if (moment < bestMoment) {
-                bestMoment = moment;
-                best = [4,row,row-1]
+            if(!followPreferences || !this.right[row].lockedRow && !this.right[row - 1].lockedRow) {
+                let tempValue = this.right[row];
+                this.right[row] = this.right[row - 1];
+                this.right[row - 1] = tempValue;
+                moment = Math.abs(this.BowSternMoment());
+                if (moment < bestMoment) {
+                    bestMoment = moment;
+                    best = [4,row,row-1]
+                }
+                tempValue = this.right[row];
+                this.right[row] = this.right[row - 1];
+                this.right[row - 1] = tempValue;
             }
-            tempValue = this.right[row];
-            this.right[row] = this.right[row - 1];
-            this.right[row - 1] = tempValue;
 
         }
         if (!this.compArrs(best, [-1,-1,-1])) {
@@ -276,6 +283,67 @@ class boat {
         } else {
             return false;
         }
+    }
+
+    corseOptimiseBowStern() {
+        const initialBowSternMoment = this.BowSternMoment();
+        const initialPortStarboardMoment = this.PortStarboardMoment();
+        let bestMoment = Math.abs(initialBowSternMoment);
+        let bestLeft = -1;
+        let bestRight = -1;
+        //If negative back heavy/ right heavy
+        let range = [0, 0, 0, 0];
+        if (initialBowSternMoment < 0) {
+            range = [5, 9, 0, 4];
+        } else {
+            range = [0, 4, 5, 9];
+        }
+        for (var initial = range[0]; initial <= range[1]; initial++) {
+            for (var secondary = range[2]; secondary <= range[3]; secondary++) {
+                if (initialPortStarboardMoment < 0) {
+                    let tempValue = this.left[secondary];
+                    this.left[secondary] = this.right[initial];
+                    this.right[initial] = tempValue;
+                } else {
+                    let tempValue = this.left[initial];
+                    this.left[initial] = this.right[secondary];
+                    this.right[secondary] = tempValue;
+                }
+                
+                let swappedMoment =this.BowSternMoment();
+                if (Math.abs(swappedMoment) < bestMoment) {
+                    if (initialPortStarboardMoment < 0) {
+                        bestLeft = secondary;
+                        bestRight = initial;
+                    } else {
+                        bestLeft = initial;
+                        bestRight = secondary;
+                    }
+                    bestMoment = Math.abs(swappedMoment);
+                }
+
+                if (initialPortStarboardMoment < 0) {
+                    let tempValue = this.left[secondary];
+                    this.left[secondary] = this.right[initial];
+                    this.right[initial] = tempValue;
+                } else {
+                    let tempValue = this.left[initial];
+                    this.left[initial] = this.right[secondary];
+                    this.right[secondary] = tempValue;
+                }  
+
+            }
+        }
+
+        if (bestLeft !== -1) {
+            let temp = this.left[bestLeft];
+            this.left[bestLeft] = this.right[bestRight];
+            this.right[bestRight] = temp;
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     compArrs(arr1,arr2) {
