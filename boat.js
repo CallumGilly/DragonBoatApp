@@ -354,6 +354,32 @@ class boat {
         return true;
     }
 
+    optimiseBoat() {
+        let timeoutCounter = 0
+        let flag = true;
+
+        for (var counter = 0; counter < 5; counter++) {
+            while (flag && timeoutCounter < 10000) {
+                flag = this.corseOptimiseBowStern();
+                timeoutCounter++;
+            }
+            timeoutCounter = 0
+            flag = true;
+            while (flag && timeoutCounter < 100) {
+                flag = this.fineOptimiseBowStern();
+                timeoutCounter++;
+            }
+            timeoutCounter = 9000
+            flag = true;
+        }
+        
+        timeoutCounter = 0
+        flag = true;
+        while (flag && timeoutCounter < 10000) {
+            flag = this.optimisePortStarboard();
+            timeoutCounter++;
+        }
+    }
 
 }
 
@@ -368,7 +394,6 @@ function sessionToBoat(sessionID) {
             resolve(theBoat);
         });
     });
-
 }
 
 //Export the boat object
