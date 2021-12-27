@@ -165,7 +165,7 @@ class boat {
         let bestRight = -1;
         for (var row = 0; row < 10; row++) {
             //if should be !F + FV Which vir absorption is !F + V where v is the valid check
-            //Only swap if not lockedside of not following preference
+            //Only swap if not locked side of not following preference
             if (!followPreferences || this.optimisePortStarboardValidSwap(this.left[row],this.right[row])) {
                 let tempValue = this.left[row];
                 this.left[row] = this.right[row];
