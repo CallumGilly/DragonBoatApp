@@ -8,7 +8,7 @@ class boat {
     //Need to add a bias for all boats
 
     //First call handling
-    constructor(boatData, paddlerList, bias = 0.8) {
+    constructor(boatData, paddlerList,isSaved, bias = 0.8) {
         //Get and store the boat data from database
         this.boatSize = boatData.boatSize;
         this.widthArray = boatData.widthArray.substring(1, boatData.widthArray.length - 1).split(",");
@@ -43,7 +43,6 @@ class boat {
                 } else if (this.right[sideIndex].isNull == true) {
                     this.right[sideIndex] = paddler;
                     notFound = false;
-                    console.log(`Here ${this.left[this.left.length - sideIndex - 1]}`)
                 } else if (this.left[this.left.length - sideIndex - 1].isNull == true) {
                     this.left[this.left.length - sideIndex - 1] = paddler;
                     notFound = false;
@@ -386,11 +385,13 @@ class boat {
 function sessionToBoat(sessionID) {
     const getBoatSQL = "SELECT boat.boatSize, boat.widthArray, boat.lengthArray, boat.boatName FROM boat INNER JOIN boatlink ON boat.boatID = boatlink.boatID WHERE boatlink.sessionID=?";
     const getPaddlersSQL = "SELECT paddlertable.username, paddlertable.gender, paddlertable.preference, paddlertable.weight FROM paddlertable INNER JOIN sessionlink ON paddlertable.username = sessionlink.username WHERE sessionlink.sessionID = ?"
+    const getIsSavedSQL = "SELECT designSaved FROM sessionTable WHERE sessionID=?"
     let boatData = databaseHandler.queryDB(getBoatSQL, [sessionID]);
     let paddlerList = databaseHandler.queryDB(getPaddlersSQL, [sessionID]);
+    let isSaved = databaseHandler.queryDB(getIsSavedSQL, [sessionID]);
     return new Promise((resolve, reject) => {
-        Promise.allSettled([boatData, paddlerList]).then((values) => {
-            let theBoat = new boat(values[0].value[0], values[1].value);
+        Promise.allSettled([boatData, paddlerList,isSaved]).then((values) => {
+            let theBoat = new boat(values[0].value[0], values[1].value,values[2].value[0].designSaved);
             resolve(theBoat);
         });
     });

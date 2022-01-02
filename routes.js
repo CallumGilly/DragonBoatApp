@@ -4,8 +4,13 @@ const mysql = require(`mysql`);
 const dotenv = require(`dotenv`).config();
 const crypto = require(`crypto`);
 const e = require("express");
+//Homemade modules
+const person = require("./person")
+const boat = require("./boat");
+//Automatic modules
 const { threadId } = require("worker_threads");
 const { create } = require("domain");
+const { DESTRUCTION } = require("dns");
 
 //Create a router object
 const router = express.Router()
@@ -51,7 +56,7 @@ router.get(`/`, (req,res) => {
 
 router.get(`/login`, (req,res) => {
     //Check if user has a valid cookie
-    checkUsernameCookie(req.signedCookies.username, (cookieData) => {
+    checkUsernameCookie(req.signedCookies.username,0, (cookieData) => {
         if (cookieData.valid) {
             // If they do redirect them without the need to login
             res.redirect(`/members`)
@@ -103,7 +108,7 @@ router.post(`/login`, (req,res) => {
 
 //Handle member area requests
 router.get(`/members`, (req,res) => {
-    checkUsernameCookie(req.signedCookies.username, (cookieData) => {
+    checkUsernameCookie(req.signedCookies.username,0, (cookieData) => {
         if (cookieData.valid) {
             //Render the members area if the cookie is valid
             res.render(`members`, {data: {fname: cookieData.result.firstName}})
@@ -150,7 +155,34 @@ router.post(`/signup`, (req,res) => {
 });
 
 router.get('/boatDesign', (req,res) => {
-    res.render(`design`, {data: {}});
+
+    checkUsernameCookie(req.signedCookies.username,1, (cookieData) => {
+        if (cookieData.valid) {
+            //Continue with boat design if there cookie is valid
+            //Check to see if a session has been specified in the URL
+            let designData = req.query;
+            if (designData.sessionID !== undefined) {
+                let currentBoat = boat.sessionToBoat(designData.sessionID);
+                currentBoat.then((value) => {
+                    res.render(`design`, {boat: value});
+                });
+            } else {
+                let sqlStatement = "SELECT * FROM sessiontable WHERE sessionDate > UTC_DATE ORDER BY sessionDate ASC"
+                db.query(sqlStatement,[],(err, result) => {
+                    if (err) {
+                        throw err;
+                    }
+                    res.render(`pickSession`, {sessionList: result})
+                });
+            }
+        } else {
+            // If the user cookie is not in the database then clear cookies and make them login again
+            //TODO: Log this
+            res.clearCookie(`username`).render(`login`, {data: {error: `Invalid Privilege level or signed out, this will be logged`}});
+        }
+    });
+
+    // res.render(`design`, {data: {}});
 });
 
 function createUser(userData, callback) {
@@ -282,9 +314,9 @@ function genRandomString(length, minNum = 33) { //Generate a string of a set len
     return randString;
 }
 
-function checkUsernameCookie(usernameCookie, callback) { //Check if a cookie is valid
+function checkUsernameCookie(usernameCookie, minPrivilege, callback) { //Check if a cookie is valid
     //Define sql statement to be used
-    let sqlStatement = `SELECT * FROM paddlertable INNER JOIN cookietable ON paddlertable.username = cookietable.username WHERE cookietable.cookie=?`
+    let sqlStatement = `SELECT privilegeLevel FROM paddlertable INNER JOIN cookietable ON paddlertable.username = cookietable.username WHERE cookietable.cookie=?`
         
     //Query the database with the username cookie
     db.query(sqlStatement, [usernameCookie], (err,result) => {
@@ -295,7 +327,11 @@ function checkUsernameCookie(usernameCookie, callback) { //Check if a cookie is 
 
         //Check to see if the user is in the database, return true if they are
         if (result[0] != undefined) {
-            callback({valid: true, result: result[0]});
+            if (result[0].privilegeLevel >= minPrivilege) {
+                callback({valid: true, result: result[0]});
+            } else {
+                callback({valid: false});
+            }
         } else {
             callback({valid: false});
         }
