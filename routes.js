@@ -164,7 +164,9 @@ router.get('/boatDesign', (req,res) => {
             if (designData.sessionID !== undefined) {
                 let currentBoat = boat.sessionToBoat(designData.sessionID);
                 currentBoat.then((value) => {
-                    res.render(`design`, {boat: value});
+                    value.saveBoat(designData.sessionID).then(() => {
+                        res.render(`design`, {boat: value});
+                    });
                 });
             } else {
                 let sqlStatement = "SELECT * FROM sessiontable WHERE sessionDate > UTC_DATE ORDER BY sessionDate ASC"
@@ -187,8 +189,11 @@ router.get('/boatDesign', (req,res) => {
 
 router.patch('/boatDesign', (req,res) => {
     if (req.query.type == "swap") {
-        console.log(req.body);
-        res.send("Success")
+        boat.sessionToBoat(req.query.sessionID).then((value) => {
+            value.swapAndSave(req.query.sessionID, req.body.pos1Row, req.body.pos1Side, req.body.pos2Row, req.body.pos2Side).then(() => {
+                res.send({"swapStatus":"OK"});
+            });
+        });
     } else {
         res.send("Hello");
         console.log("Here");

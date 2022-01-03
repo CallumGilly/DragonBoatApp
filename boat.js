@@ -14,7 +14,8 @@ class boat {
         this.widthArray = boatData.widthArray.substring(1, boatData.widthArray.length - 1).split(",");
         this.lengthArray = boatData.lengthArray;
         this.boatName = boatData.boatName;
-        this.bias = bias
+        this.bias = bias;
+        
         //Create arrays to contain data about paddler position
         this.left = []
         for (var x = 0; x < this.boatSize / 2; x++) {
@@ -24,34 +25,62 @@ class boat {
         for (var x = 0; x < this.boatSize / 2; x++) {
             this.right[x] = new person;
         }
-        //Convert the paddler list from the database into a standardized array of person objects
-        let allPaddlers = []
-        paddlerList.forEach(element => {
-            allPaddlers[allPaddlers.length] = new person(element.username, element.gender, element.weight, element.preference);
-        });
-        //Sort list of paddlers
-        allPaddlers.sort((a, b) => {
-            return a.weight - b.weight
-        });
-        //Place all paddlers into each side of there boat filling the first two spots and then in the order LF -> RF -> LB -> RB such that the heaver people are at the middle/ back
-        allPaddlers.forEach(paddler => {
-            let notFound = true;
-            for (var sideIndex = 0; sideIndex <= this.left.length / 2 && notFound; sideIndex++) {
-                if (this.left[sideIndex].isNull == true) {
-                    this.left[sideIndex] = paddler;
-                    notFound = false;
-                } else if (this.right[sideIndex].isNull == true) {
-                    this.right[sideIndex] = paddler;
-                    notFound = false;
-                } else if (this.left[this.left.length - sideIndex - 1].isNull == true) {
-                    this.left[this.left.length - sideIndex - 1] = paddler;
-                    notFound = false;
-                } else if (this.right[this.right.length - sideIndex - 1].isNull == true) {
-                    this.right[this.right.length - sideIndex - 1] = paddler;
-                    notFound = false;
+        if (isSaved) {
+            paddlerList.forEach(element => {
+                let currentPaddler = new person(element.username, element.gender, element.weight, element.preference);
+                if (element.tempSide == "L") {
+                    this.left[element.tempRow] = currentPaddler;
+                } else if (element.tempSide == "R") {
+                    this.right[element.tempRow] = currentPaddler;
+                } else {
+                    let notFound = true;
+                    for (var sideIndex = 0; sideIndex <= this.left.length / 2 && notFound; sideIndex++) {
+                        if (this.left[sideIndex].isNull == true) {
+                            this.left[sideIndex] = currentPaddler;
+                            notFound = false;
+                        } else if (this.right[sideIndex].isNull == true) {
+                            this.right[sideIndex] = currentPaddler;
+                            notFound = false;
+                        } else if (this.left[this.left.length - sideIndex - 1].isNull == true) {
+                            this.left[this.left.length - sideIndex - 1] = currentPaddler;
+                            notFound = false;
+                        } else if (this.right[this.right.length - sideIndex - 1].isNull == true) {
+                            this.right[this.right.length - sideIndex - 1] = currentPaddler;
+                            notFound = false;
+                        }
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            //Convert the paddler list from the database into a standardized array of person objects
+            let allPaddlers = []
+            paddlerList.forEach(element => {
+                allPaddlers[allPaddlers.length] = new person(element.username, element.gender, element.weight, element.preference);
+            });
+            //Sort list of paddlers
+            allPaddlers.sort((a, b) => {
+                return a.weight - b.weight
+            });
+            //Place all paddlers into each side of there boat filling the first two spots and then in the order LF -> RF -> LB -> RB such that the heaver people are at the middle/ back
+            allPaddlers.forEach(paddler => {
+                let notFound = true;
+                for (var sideIndex = 0; sideIndex <= this.left.length / 2 && notFound; sideIndex++) {
+                    if (this.left[sideIndex].isNull == true) {
+                        this.left[sideIndex] = paddler;
+                        notFound = false;
+                    } else if (this.right[sideIndex].isNull == true) {
+                        this.right[sideIndex] = paddler;
+                        notFound = false;
+                    } else if (this.left[this.left.length - sideIndex - 1].isNull == true) {
+                        this.left[this.left.length - sideIndex - 1] = paddler;
+                        notFound = false;
+                    } else if (this.right[this.right.length - sideIndex - 1].isNull == true) {
+                        this.right[this.right.length - sideIndex - 1] = paddler;
+                        notFound = false;
+                    }
+                }
+            });
+        }
     }
 
     //Calculate the moment between port and starboard in the clockwise direction
@@ -380,11 +409,60 @@ class boat {
         }
     }
 
+    swapAndSave(sessionID, pos1Row, pos1Side, pos2Row, pos2Side) {
+        let pos1Arr;
+        let pos2Arr;
+        if (pos1Side == "L") {
+            pos1Arr = this.left;
+        } else {
+            pos1Arr = this.right;
+        }
+
+        if (pos2Side == "L") {
+            pos2Arr = this.left;
+        } else {
+            pos2Arr = this.right;
+        }
+
+        let tempPaddler = pos1Arr[pos1Row];
+        pos1Arr[pos1Row] = pos2Arr[pos2Row];
+        pos2Arr[pos2Row] = tempPaddler;
+        const updateSQL = "UPDATE sessionLink SET tempSide=?, tempRow=? WHERE username=? AND sessionID=?";
+        let save1 = databaseHandler.queryDB(updateSQL, [pos2Side,pos2Row, pos2Arr[pos2Row].username, sessionID]);
+        let save2 = databaseHandler.queryDB(updateSQL, [pos1Side,pos1Row, pos1Arr[pos1Row].username, sessionID]);
+
+        return new Promise ((resolve, reject) => {
+            Promise.allSettled([save1,save2]).then((values) => {
+                resolve();
+            });
+        });
+    }
+
+    saveBoat(sessionID) {
+        let promiseList = [];
+        promiseList[promiseList.length] = databaseHandler.queryDB("UPDATE sessiontable SET designSaved=1 WHERE sessionID=?", [sessionID]);
+        for (var row = 0; row < this.left.length; row++) {
+            const updateLeft = "UPDATE sessionLink SET tempSide='L', tempRow=? WHERE username=? AND sessionID=?";
+            const updateRight = "UPDATE sessionLink SET tempSide='R', tempRow=? WHERE username=? AND sessionID=?";
+            if (!this.left[row].isNull) {
+                promiseList[promiseList.length] = databaseHandler.queryDB(updateLeft, [row, this.left[row],sessionID]);
+            }
+            if (!this.right[row].isNull) {
+                promiseList[promiseList.length] = databaseHandler.queryDB(updateRight, [row, this.right[row],sessionID]);
+            }
+        }
+
+        return new Promise ((resolve, reject) => {
+            Promise.allSettled(promiseList).then((values) => {
+                resolve();
+            });
+        });
+    }
 }
 
 function sessionToBoat(sessionID) {
     const getBoatSQL = "SELECT boat.boatSize, boat.widthArray, boat.lengthArray, boat.boatName FROM boat INNER JOIN boatlink ON boat.boatID = boatlink.boatID WHERE boatlink.sessionID=?";
-    const getPaddlersSQL = "SELECT paddlertable.username, paddlertable.gender, paddlertable.preference, paddlertable.weight FROM paddlertable INNER JOIN sessionlink ON paddlertable.username = sessionlink.username WHERE sessionlink.sessionID = ?"
+    const getPaddlersSQL = "SELECT paddlertable.username, paddlertable.gender, paddlertable.preference, paddlertable.weight, sessionlink.tempSide, sessionlink.tempRow FROM paddlertable INNER JOIN sessionlink ON paddlertable.username = sessionlink.username WHERE sessionlink.sessionID = ?"
     const getIsSavedSQL = "SELECT designSaved FROM sessionTable WHERE sessionID=?"
     let boatData = databaseHandler.queryDB(getBoatSQL, [sessionID]);
     let paddlerList = databaseHandler.queryDB(getPaddlersSQL, [sessionID]);
