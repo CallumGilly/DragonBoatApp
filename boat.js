@@ -27,7 +27,7 @@ class boat {
         }
         if (isSaved) {
             paddlerList.forEach(element => {
-                let currentPaddler = new person(element.username, element.gender, element.weight, element.preference);
+                let currentPaddler = new person(element.username, element.gender, element.weight, element.preference, element.isLocked);
                 if (element.tempSide == "L") {
                     this.left[element.tempRow] = currentPaddler;
                 } else if (element.tempSide == "R") {
@@ -409,6 +409,33 @@ class boat {
         }
     }
 
+    lockAndSave(sessionID, index, side) {
+        const lockedSQL = "SELECT isLocked FROM sessionLink WHERE username=? AND sessionID=?";
+        let currentArr;
+        if (side=="L") {
+            currentArr = this.left;
+        } else {
+            currentArr = this.right;
+        }
+        let initialSelect = databaseHandler.queryDB(lockedSQL, [currentArr[index].username, sessionID])
+        return new Promise ((resolve,reject) => {
+            Promise.allSettled([initialSelect]).then((value) => {
+                const updateSQL = "UPDATE sessionlink SET isLocked=? WHERE username=? AND sessionID=?";
+                let lockVal;
+                if (value[0].value[0].isLocked == 0) {
+                    lockVal = 1;
+                } else {
+                    lockVal = 0
+                }
+                console.log()
+                let updater = databaseHandler.queryDB(updateSQL, [lockVal, currentArr[index].username, sessionID]);
+                    Promise.allSettled([updater]).then((values) => {
+                        resolve();
+                    });
+            })
+        })
+    }
+
     swapAndSave(sessionID, pos1Row, pos1Side, pos2Row, pos2Side) {
         let pos1Arr;
         let pos2Arr;
@@ -458,11 +485,20 @@ class boat {
             });
         });
     }
+
+    calculatePortStarboardAngle() {
+        return 0;
+    }
+
+    calculateBowSternAngle() {
+        return -15
+    }
+
 }
 
 function sessionToBoat(sessionID) {
     const getBoatSQL = "SELECT boat.boatSize, boat.widthArray, boat.lengthArray, boat.boatName FROM boat INNER JOIN boatlink ON boat.boatID = boatlink.boatID WHERE boatlink.sessionID=?";
-    const getPaddlersSQL = "SELECT paddlertable.username, paddlertable.gender, paddlertable.preference, paddlertable.weight, sessionlink.tempSide, sessionlink.tempRow FROM paddlertable INNER JOIN sessionlink ON paddlertable.username = sessionlink.username WHERE sessionlink.sessionID = ?"
+    const getPaddlersSQL = "SELECT paddlertable.username, paddlertable.gender, paddlertable.preference, paddlertable.weight, sessionlink.tempSide, sessionlink.tempRow, sessionlink.isLocked FROM paddlertable INNER JOIN sessionlink ON paddlertable.username = sessionlink.username WHERE sessionlink.sessionID = ?"
     const getIsSavedSQL = "SELECT designSaved FROM sessionTable WHERE sessionID=?"
     let boatData = databaseHandler.queryDB(getBoatSQL, [sessionID]);
     let paddlerList = databaseHandler.queryDB(getPaddlersSQL, [sessionID]);

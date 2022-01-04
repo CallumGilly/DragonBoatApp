@@ -4,22 +4,38 @@
     </script>
     <!-- Bootstrap learned from https://www.w3schools.com/bootstrap5/bootstrap_forms.php -->
     <!-- Make boat and populate with data from sever -->
-    <svg width="500" height="1000">
-        <ellipse style="fill: rgb(255, 255, 255); stroke: #000000; fill-opacity: 0.9;" cx="220" cy="455" rx="100" ry="410"></ellipse>
-        <line x1="220" y1="45" x2="220" y2="860" stroke-dasharray="10,10" style="stroke:rgb(141, 141, 141);stroke-width:1"></line>
-        <!-- Assume the boat has 10 rows for simplicity -->
-        <!-- Per Row -->
-        <% for( let index = 0; index < boat.left.length; index++ ) { %>
-            <text x="10" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill: rgb(141, 141, 141);"><%-boat.left[index].weight%></text>
-            <rect x="30" y=<%=190+(55*index)%> height="20" width="80"  style="stroke: rgb(0, 0, 0); fill:rgb(255, 255, 255);" onClick="boxClicked('L',<%=index%>)"></rect>
-            <text x="70" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill: rgb(0, 0, 0);" onClick="boxClicked('L',<%=index%>)"><%-boat.left[index].username%></text>
-            <text x="220" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill:rgb(141, 141, 141);">-  Row <%-index+1%>  -</text>
-            <rect x="325" y=<%=190+(55*index)%> height="20" width="80"  style="stroke: rgb(0, 0, 0); fill:rgb(255, 255, 255);" onClick="boxClicked('R',<%=index%>)"></rect>
-            <text x="365" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill: rgb(0, 0, 0);" onClick="boxClicked('R',<%=index%>)"><%-boat.right[index].username%></text>
-            <text x="425" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill: rgb(141, 141, 141);"><%-boat.right[index].weight%></text>
-        <% } %>
+    <div class="row">
+        <div class="col">
+            <svg width="1500" height="900">
+                <ellipse style="fill: rgb(255, 255, 255); stroke: rgb(0, 0, 0); fill-opacity: 0.9;" cx="240" cy="455" rx="100" ry="410"></ellipse>
+                <line x1="240" y1="45" x2="240" y2="860" stroke-dasharray="10,10" style="stroke:rgb(141, 141, 141);stroke-width:1"></line>
+                <!-- Assume the boat has 10 rows for simplicity -->
+                <!-- Per Row -->
+                <% for( let index = 0; index < boat.left.length; index++ ) { %>
+                    <rect x="0" y=<%=190+(55*index)%> style="stroke:rgb(0, 0, 0); fill:rgb(255, 255, 255)" height="20" width="20" onClick="lockClicked('L',<%=index%>)"></rect>
+                    <path transform="translate(<%-!boat.left[index].lockedRow * -1000%>, 0)" d="M 0 <%-190+(55*index)%> m14 8h-1v-3c0-2-2-4-4-4s-4 2-4 4v3h-1c0 0-1 0-1 0v9c0 0 1 1 1 1h10c0 0 1-1 1-1v-9c0 0-1 0-1 0zm-8-3c0-1 2-2 3-2s3 1 3 2v3h-6v-3zm7 11h-8v-7h8v7z"></path>
+                    <text x="30" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill: rgb(141, 141, 141);"><%-boat.left[index].weight%></text>
+                    <rect x="50" y=<%=190+(55*index)%> height="20" width="80"  style="stroke: rgb(0, 0, 0); fill:rgb(255, 255, 255);" onClick="boxClicked('L',<%=index%>)"></rect>
+                    <text x="90" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill: rgb(0, 0, 0);" onClick="boxClicked('L',<%=index%>)"><%-boat.left[index].username%></text>
+                    <text x="240" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill:rgb(141, 141, 141);">-  Row <%-index+1%>  -</text>
+                    <rect x="345" y=<%=190+(55*index)%> height="20" width="80"  style="stroke: rgb(0, 0, 0); fill:rgb(255, 255, 255);" onClick="boxClicked('R',<%=index%>)"></rect>
+                    <text x="385" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill: rgb(0, 0, 0);" onClick="boxClicked('R',<%=index%>)"><%-boat.right[index].username%></text>
+                    <text x="445" y=<%=200+(55*index)%> dominant-baseline="middle" text-anchor="middle" style="fill: rgb(141, 141, 141);"><%-boat.right[index].weight%></text>
+                    <rect x="460" y=<%=190+(55*index)%> style="stroke:rgb(0, 0, 0); fill:rgb(255, 255, 255)" height="20" width="20" onClick="lockClicked('R',<%=index%>)"></rect>
+                    <path transform="translate(<%-!boat.right[index].lockedRow * -1000%>, 0)" d="M 460 <%-190+(55*index)%> m14 8h-1v-3c0-2-2-4-4-4s-4 2-4 4v3h-1c0 0-1 0-1 0v9c0 0 1 1 1 1h10c0 0 1-1 1-1v-9c0 0-1 0-1 0zm-8-3c0-1 2-2 3-2s3 1 3 2v3h-6v-3zm7 11h-8v-7h8v7z"></path>
+                    
+                <% } %>
+                <!-- Make port starboard view with surrounding rectangle-->
+                <rect x="500" y="150" width="500" height="250"></rect>
+                <path d="m 550 200 h 400 l -100 150 l -200 0 l -100 -150" style="fill:rgb(141, 141, 141); stroke: rgb(26, 26, 26)" transform="rotate(<%-portStarboardAngle%>, 750, 275)"/>
+                <!-- Make bow stern view -->
+                <rect x="500" y="500" width="700" height="280"></rect>
+                <path d="m 550 600 l 600 0 l -50 80 l -500 0 l -50 -80 z" style="fill:rgb(141, 141, 141); stroke: rgb(26, 26, 26)" transform="rotate(<%-bowSternAngle%>, 850, 640)"/>
+            </svg>        
+        </div>
+      </div>
+    
+    
 
-        
-    </svg>
     <script src="/public/designScripts.js"></script>
 <%- include('footer') -%>

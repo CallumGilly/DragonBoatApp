@@ -165,7 +165,7 @@ router.get('/boatDesign', (req,res) => {
                 let currentBoat = boat.sessionToBoat(designData.sessionID);
                 currentBoat.then((value) => {
                     value.saveBoat(designData.sessionID).then(() => {
-                        res.render(`design`, {boat: value});
+                        res.render(`design`, {boat: value, portStarboardAngle: value.calculatePortStarboardAngle(), bowSternAngle: value.calculateBowSternAngle()});
                     });
                 });
             } else {
@@ -194,7 +194,13 @@ router.patch('/boatDesign', (req,res) => {
                 res.send({"swapStatus":"OK"});
             });
         });
-    } else {
+    } else if (req.query.type == "lock") {
+        boat.sessionToBoat(req.query.sessionID).then((value) => {
+            value.lockAndSave(req.query.sessionID, req.body.index, req.body.side).then(() => {
+                res.send({"lockStatus":"OK"});
+            })
+        })
+    }else {
         res.send("Hello");
         console.log("Here");
     }
