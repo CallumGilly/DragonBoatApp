@@ -390,6 +390,7 @@ class boat {
             while (flag && timeoutCounter < 10000) {
                 flag = this.corseOptimiseBowStern();
                 timeoutCounter++;
+                console.log("Spam")
             }
             timeoutCounter = 0
             flag = true;
@@ -407,6 +408,7 @@ class boat {
             flag = this.optimisePortStarboard();
             timeoutCounter++;
         }
+
     }
 
     lockAndSave(sessionID, index, side) {
@@ -427,7 +429,6 @@ class boat {
                 } else {
                     lockVal = 0
                 }
-                console.log()
                 let updater = databaseHandler.queryDB(updateSQL, [lockVal, currentArr[index].username, sessionID]);
                     Promise.allSettled([updater]).then((values) => {
                         resolve();
@@ -472,26 +473,26 @@ class boat {
             const updateLeft = "UPDATE sessionLink SET tempSide='L', tempRow=? WHERE username=? AND sessionID=?";
             const updateRight = "UPDATE sessionLink SET tempSide='R', tempRow=? WHERE username=? AND sessionID=?";
             if (!this.left[row].isNull) {
-                promiseList[promiseList.length] = databaseHandler.queryDB(updateLeft, [row, this.left[row],sessionID]);
+                promiseList[promiseList.length] = databaseHandler.queryDB(updateLeft, [row, this.left[row].username,sessionID]);
             }
             if (!this.right[row].isNull) {
-                promiseList[promiseList.length] = databaseHandler.queryDB(updateRight, [row, this.right[row],sessionID]);
+                promiseList[promiseList.length] = databaseHandler.queryDB(updateRight, [row, this.right[row].username,sessionID]);
             }
         }
-
         return new Promise ((resolve, reject) => {
-            Promise.allSettled(promiseList).then((values) => {
+            Promise.allSettled(promiseList).then((values) => {          
+                console.log("saved");
                 resolve();
             });
         });
     }
 
     calculatePortStarboardAngle() {
-        return 0;
+        return (this.PortStarboardMoment() / 30);
     }
 
     calculateBowSternAngle() {
-        return -15
+        return (this.BowSternMoment() / -30);
     }
 
 }
