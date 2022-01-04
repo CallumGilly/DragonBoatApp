@@ -1,0 +1,21 @@
+<%- include('header') -%>
+    <!-- Bootstrap learned from https://www.w3schools.com/bootstrap5/bootstrap_forms.php -->
+    <div class="card mt-4 p-2">
+        <div class="card-body">
+            <form method="get" action="/boatDesign">
+                <h3>Select an upcoming session</h3>
+                <div class="pb-3">
+                    <label class="form-label" for="sessionID">Session:</label>
+                    <select class="form-select form-control" name="sessionID" id="sessionID">
+                        <% for( let index = 0; index < sessionList.length; index++ ) { %>
+                            <option value=<%-sessionList[index].sessionID%> ><%-sessionList[index].sessionDate%></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+<%- include('footer') -%> 
