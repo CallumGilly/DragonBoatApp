@@ -313,7 +313,7 @@ class boat {
         }
     }
 
-    corseOptimiseBowStern() {
+    corseOptimiseBowStern(followPreferences=true) {
         const initialBowSternMoment = this.BowSternMoment();
         const initialPortStarboardMoment = this.PortStarboardMoment();
         let bestMoment = Math.abs(initialBowSternMoment);
@@ -328,14 +328,18 @@ class boat {
         }
         for (var initial = range[0]; initial <= range[1]; initial++) {
             for (var secondary = range[2]; secondary <= range[3]; secondary++) {
-                if (initialPortStarboardMoment < 0) {
-                    let tempValue = this.left[secondary];
-                    this.left[secondary] = this.right[initial];
-                    this.right[initial] = tempValue;
+                if (initialPortStarboardMoment < 0) {                    
+                    if (!followPreferences || (!this.left[secondary].lockedSide && !this.left[secondary].lockedRow && !this.right[initial].lockedRow && !this.right[initial].lockedSide)) {
+                        let tempValue = this.left[secondary];
+                        this.left[secondary] = this.right[initial];
+                        this.right[initial] = tempValue;
+                    }                    
                 } else {
-                    let tempValue = this.left[initial];
-                    this.left[initial] = this.right[secondary];
-                    this.right[secondary] = tempValue;
+                    if (!followPreferences || (!this.right[secondary].lockedSide && !this.right[secondary].lockedRow && !this.left[initial].lockedRow && !this.left[initial].lockedSide)) {                    
+                        let tempValue = this.left[initial];
+                        this.left[initial] = this.right[secondary];
+                        this.right[secondary] = tempValue;
+                    }
                 }
                 
                 let swappedMoment =this.BowSternMoment();
@@ -351,14 +355,18 @@ class boat {
                 }
 
                 if (initialPortStarboardMoment < 0) {
-                    let tempValue = this.left[secondary];
-                    this.left[secondary] = this.right[initial];
-                    this.right[initial] = tempValue;
+                    if (!followPreferences || (!this.left[secondary].lockedSide && !this.left[secondary].lockedRow && !this.right[initial].lockedRow && !this.right[initial].lockedSide)) {
+                        let tempValue = this.left[secondary];
+                        this.left[secondary] = this.right[initial];
+                        this.right[initial] = tempValue;
+                    }
                 } else {
-                    let tempValue = this.left[initial];
-                    this.left[initial] = this.right[secondary];
-                    this.right[secondary] = tempValue;
-                }  
+                    if (!followPreferences || (!this.right[secondary].lockedSide && !this.right[secondary].lockedRow && !this.left[initial].lockedRow && !this.left[initial].lockedSide)) {                    
+                        let tempValue = this.left[initial];
+                        this.left[initial] = this.right[secondary];
+                        this.right[secondary] = tempValue;
+                    }  
+                }
 
             }
         }
@@ -390,7 +398,6 @@ class boat {
             while (flag && timeoutCounter < 10000) {
                 flag = this.corseOptimiseBowStern();
                 timeoutCounter++;
-                console.log("Spam")
             }
             timeoutCounter = 0
             flag = true;
@@ -481,7 +488,6 @@ class boat {
         }
         return new Promise ((resolve, reject) => {
             Promise.allSettled(promiseList).then((values) => {          
-                console.log("saved");
                 resolve();
             });
         });

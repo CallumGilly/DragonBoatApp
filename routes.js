@@ -162,6 +162,7 @@ router.get('/boatDesign', (req,res) => {
             //Check to see if a session has been specified in the URL
             let designData = req.query;
             if (designData.sessionID !== undefined) {
+                //Check a boat is linked to the session                
                 let currentBoat = boat.sessionToBoat(designData.sessionID);
                 currentBoat.then((value) => {
                     value.saveBoat(designData.sessionID).then(() => {
@@ -203,7 +204,6 @@ router.patch('/boatDesign', (req,res) => {
     } else if (req.query.type = "balance") {
         boat.sessionToBoat(req.query.sessionID).then((value) => {
             value.optimiseBoat();
-            console.log(value.left);
             value.saveBoat(req.query.sessionID).then(() => {
                 res.send({"balanceStatus":"OK"});
             })
