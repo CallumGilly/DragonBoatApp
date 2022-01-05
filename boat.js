@@ -2,6 +2,7 @@
 const person = require(`./person`);
 //Require database access
 const databaseHandler = require('./databaseHandler');
+const { init } = require('express/lib/application');
 
 //Define the boat object
 class boat {
@@ -313,6 +314,20 @@ class boat {
         }
     }
 
+    corseOptimiseSwapper (followPreferences, leftIndex, rightIndex) {
+        if (followPreferences) {
+            if (!this.left[leftIndex].isNull) {
+                if (this.left[leftIndex].lockedRow || this.left[leftIndex].lockedSide) {return -1;}
+            }
+            if (!this.right[rightIndex].isNull) {
+                if (this.right[rightIndex].lockedRow || this.right[rightIndex].lockedSide) {return -1;}
+            }
+        }
+        let tempValue = this.left[leftIndex];
+        this.left[leftIndex] = this.right[rightIndex];
+        this.right[rightIndex] = tempValue;
+    }
+
     corseOptimiseBowStern(followPreferences = true) {
         const initialBowSternMoment = this.BowSternMoment();
         const initialPortStarboardMoment = this.PortStarboardMoment();
@@ -329,17 +344,9 @@ class boat {
         for (var initial = range[0]; initial <= range[1]; initial++) {
             for (var secondary = range[2]; secondary <= range[3]; secondary++) {
                 if (initialPortStarboardMoment < 0) {
-                    if (!followPreferences || (!this.left[secondary].lockedSide && !this.left[secondary].lockedRow && !this.right[initial].lockedRow && !this.right[initial].lockedSide)) {
-                        let tempValue = this.left[secondary];
-                        this.left[secondary] = this.right[initial];
-                        this.right[initial] = tempValue;
-                    }
+                    this.corseOptimiseSwapper(followPreferences,secondary,initial);
                 } else {
-                    if (!followPreferences || (!this.right[secondary].lockedSide && !this.right[secondary].lockedRow && !this.left[initial].lockedRow && !this.left[initial].lockedSide)) {
-                        let tempValue = this.left[initial];
-                        this.left[initial] = this.right[secondary];
-                        this.right[secondary] = tempValue;
-                    }
+                    this.corseOptimiseSwapper(followPreferences,initial,secondary);
                 }
 
                 let swappedMoment = this.BowSternMoment();
@@ -355,17 +362,9 @@ class boat {
                 }
 
                 if (initialPortStarboardMoment < 0) {
-                    if (!followPreferences || (!this.left[secondary].lockedSide && !this.left[secondary].lockedRow && !this.right[initial].lockedRow && !this.right[initial].lockedSide)) {
-                        let tempValue = this.left[secondary];
-                        this.left[secondary] = this.right[initial];
-                        this.right[initial] = tempValue;
-                    }
+                    this.corseOptimiseSwapper(followPreferences,secondary,initial);
                 } else {
-                    if (!followPreferences || (!this.right[secondary].lockedSide && !this.right[secondary].lockedRow && !this.left[initial].lockedRow && !this.left[initial].lockedSide)) {
-                        let tempValue = this.left[initial];
-                        this.left[initial] = this.right[secondary];
-                        this.right[secondary] = tempValue;
-                    }
+                    this.corseOptimiseSwapper(followPreferences,initial,secondary);
                 }
 
             }
