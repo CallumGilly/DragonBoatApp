@@ -8,14 +8,14 @@ class boat {
     //Need to add a bias for all boats
 
     //First call handling
-    constructor(boatData, paddlerList,isSaved, bias = 0.8) {
+    constructor(boatData, paddlerList, isSaved, bias = 0.8) {
         //Get and store the boat data from database
         this.boatSize = boatData.boatSize;
         this.widthArray = boatData.widthArray.substring(1, boatData.widthArray.length - 1).split(",");
         this.lengthArray = boatData.lengthArray;
         this.boatName = boatData.boatName;
         this.bias = bias;
-        
+
         //Create arrays to contain data about paddler position
         this.left = []
         for (var x = 0; x < this.boatSize / 2; x++) {
@@ -166,16 +166,16 @@ class boat {
         newArray[theNewPos].lockedRow = true;
     }
 
-    optimisePortStarboardValidSwap(pad1,pad2) {
+    optimisePortStarboardValidSwap(pad1, pad2) {
         if (pad1 === null) {
-            if(pad2 === null) {
+            if (pad2 === null) {
                 return false;
             } else if (pad2.lockedSide == true) {
                 return false;
             }
-        } else if (pad1.lockedSide == true)  {
-            return false;            
-        } else if(pad2 === null) {
+        } else if (pad1.lockedSide == true) {
+            return false;
+        } else if (pad2 === null) {
             return true;
         } else if (pad2.lockedSide == true) {
             return false;
@@ -184,7 +184,7 @@ class boat {
     }
 
     //Change the side of the boat until it is
-    optimisePortStarboard(followPreferences=true) {
+    optimisePortStarboard(followPreferences = true) {
         //If negative back heavy/ right heavy
         const initialMoment = this.PortStarboardMoment();
 
@@ -194,7 +194,7 @@ class boat {
         for (var row = 0; row < 10; row++) {
             //if should be !F + FV Which vir absorption is !F + V where v is the valid check
             //Only swap if not locked side of not following preference
-            if (!followPreferences || this.optimisePortStarboardValidSwap(this.left[row],this.right[row])) {
+            if (!followPreferences || this.optimisePortStarboardValidSwap(this.left[row], this.right[row])) {
                 let tempValue = this.left[row];
                 this.left[row] = this.right[row];
                 this.right[row] = tempValue;
@@ -207,7 +207,7 @@ class boat {
                 tempValue = this.left[row];
                 this.left[row] = this.right[row];
                 this.right[row] = tempValue;
-            }            
+            }
         }
         if (bestLeft !== -1) {
             let tempValue = this.left[bestLeft];
@@ -219,62 +219,62 @@ class boat {
         }
     }
 
-    fineOptimiseBowStern(followPreferences=true) {
+    fineOptimiseBowStern(followPreferences = true) {
         //If negative back heavy/ right heavy
         const initialMoment = this.BowSternMoment();
         let bestMoment = Math.abs(initialMoment);
         //Sides, pos1, pos2 sides in form: 1 = LeftLeft, 2 = LeftRight, 3 = RightLeft, 4 = RightRight
-        let best = [-1,-1,-1];
+        let best = [-1, -1, -1];
         for (var row = 1; row < 10; row++) {
-            if(!followPreferences || !this.left[row].lockedRow && !this.left[row - 1].lockedRow) {
+            if (!followPreferences || !this.left[row].lockedRow && !this.left[row - 1].lockedRow) {
                 let tempValue = this.left[row];
                 this.left[row] = this.left[row - 1];
                 this.left[row - 1] = tempValue;
                 var moment = Math.abs(this.BowSternMoment());
                 if (moment < bestMoment) {
                     bestMoment = moment;
-                    best = [1,row,row-1]
+                    best = [1, row, row - 1]
                 }
                 tempValue = this.left[row];
                 this.left[row] = this.left[row - 1];
-            this.left[row - 1] = tempValue;
+                this.left[row - 1] = tempValue;
             }
 
-            if(!followPreferences || !this.left[row].lockedRow && !this.right[row - 1].lockedRow && !this.left[row].lockedSide && !this.right[row - 1].lockedSide) {
+            if (!followPreferences || !this.left[row].lockedRow && !this.right[row - 1].lockedRow && !this.left[row].lockedSide && !this.right[row - 1].lockedSide) {
                 let tempValue = this.left[row];
                 this.left[row] = this.right[row - 1];
                 this.right[row - 1] = tempValue;
                 moment = Math.abs(this.BowSternMoment());
                 if (moment < bestMoment) {
                     bestMoment = moment;
-                    best = [2,row,row-1]
+                    best = [2, row, row - 1]
                 }
                 tempValue = this.left[row];
                 this.left[row] = this.right[row - 1];
                 this.right[row - 1] = tempValue;
             }
-            if(!followPreferences || !this.right[row].lockedRow && !this.left[row - 1].lockedRow && !this.right[row].lockedSide && !this.left[row - 1].lockedSide) {
+            if (!followPreferences || !this.right[row].lockedRow && !this.left[row - 1].lockedRow && !this.right[row].lockedSide && !this.left[row - 1].lockedSide) {
                 let tempValue = this.right[row];
                 this.right[row] = this.left[row - 1];
                 this.left[row - 1] = tempValue;
                 moment = Math.abs(this.BowSternMoment());
                 if (moment < bestMoment) {
                     bestMoment = moment;
-                    best = [3,row,row-1]
+                    best = [3, row, row - 1]
                 }
                 tempValue = this.right[row];
                 this.right[row] = this.left[row - 1];
                 this.left[row - 1] = tempValue;
             }
 
-            if(!followPreferences || !this.right[row].lockedRow && !this.right[row - 1].lockedRow) {
+            if (!followPreferences || !this.right[row].lockedRow && !this.right[row - 1].lockedRow) {
                 let tempValue = this.right[row];
                 this.right[row] = this.right[row - 1];
                 this.right[row - 1] = tempValue;
                 moment = Math.abs(this.BowSternMoment());
                 if (moment < bestMoment) {
                     bestMoment = moment;
-                    best = [4,row,row-1]
+                    best = [4, row, row - 1]
                 }
                 tempValue = this.right[row];
                 this.right[row] = this.right[row - 1];
@@ -282,7 +282,7 @@ class boat {
             }
 
         }
-        if (!this.compArrs(best, [-1,-1,-1])) {
+        if (!this.compArrs(best, [-1, -1, -1])) {
             switch (best[0]) {
                 case 1:
                     var tempValue = this.left[best[1]];
@@ -313,7 +313,7 @@ class boat {
         }
     }
 
-    corseOptimiseBowStern(followPreferences=true) {
+    corseOptimiseBowStern(followPreferences = true) {
         const initialBowSternMoment = this.BowSternMoment();
         const initialPortStarboardMoment = this.PortStarboardMoment();
         let bestMoment = Math.abs(initialBowSternMoment);
@@ -328,21 +328,21 @@ class boat {
         }
         for (var initial = range[0]; initial <= range[1]; initial++) {
             for (var secondary = range[2]; secondary <= range[3]; secondary++) {
-                if (initialPortStarboardMoment < 0) {                    
+                if (initialPortStarboardMoment < 0) {
                     if (!followPreferences || (!this.left[secondary].lockedSide && !this.left[secondary].lockedRow && !this.right[initial].lockedRow && !this.right[initial].lockedSide)) {
                         let tempValue = this.left[secondary];
                         this.left[secondary] = this.right[initial];
                         this.right[initial] = tempValue;
-                    }                    
+                    }
                 } else {
-                    if (!followPreferences || (!this.right[secondary].lockedSide && !this.right[secondary].lockedRow && !this.left[initial].lockedRow && !this.left[initial].lockedSide)) {                    
+                    if (!followPreferences || (!this.right[secondary].lockedSide && !this.right[secondary].lockedRow && !this.left[initial].lockedRow && !this.left[initial].lockedSide)) {
                         let tempValue = this.left[initial];
                         this.left[initial] = this.right[secondary];
                         this.right[secondary] = tempValue;
                     }
                 }
-                
-                let swappedMoment =this.BowSternMoment();
+
+                let swappedMoment = this.BowSternMoment();
                 if (Math.abs(swappedMoment) < bestMoment) {
                     if (initialPortStarboardMoment < 0) {
                         bestLeft = secondary;
@@ -361,11 +361,11 @@ class boat {
                         this.right[initial] = tempValue;
                     }
                 } else {
-                    if (!followPreferences || (!this.right[secondary].lockedSide && !this.right[secondary].lockedRow && !this.left[initial].lockedRow && !this.left[initial].lockedSide)) {                    
+                    if (!followPreferences || (!this.right[secondary].lockedSide && !this.right[secondary].lockedRow && !this.left[initial].lockedRow && !this.left[initial].lockedSide)) {
                         let tempValue = this.left[initial];
                         this.left[initial] = this.right[secondary];
                         this.right[secondary] = tempValue;
-                    }  
+                    }
                 }
 
             }
@@ -382,10 +382,10 @@ class boat {
 
     }
 
-    compArrs(arr1,arr2) {
-        if (arr1.length !== arr2.length) {return false};
+    compArrs(arr1, arr2) {
+        if (arr1.length !== arr2.length) { return false };
         for (var index = 0; index < arr1.length; index++) {
-            if (arr1[index] !== arr2[index]) {return false;};
+            if (arr1[index] !== arr2[index]) { return false; };
         }
         return true;
     }
@@ -408,7 +408,7 @@ class boat {
             timeoutCounter = 9000
             flag = true;
         }
-        
+
         timeoutCounter = 0
         flag = true;
         while (flag && timeoutCounter < 10000) {
@@ -421,13 +421,13 @@ class boat {
     lockAndSave(sessionID, index, side) {
         const lockedSQL = "SELECT isLocked FROM sessionLink WHERE username=? AND sessionID=?";
         let currentArr;
-        if (side=="L") {
+        if (side == "L") {
             currentArr = this.left;
         } else {
             currentArr = this.right;
         }
         let initialSelect = databaseHandler.queryDB(lockedSQL, [currentArr[index].username, sessionID])
-        return new Promise ((resolve,reject) => {
+        return new Promise((resolve, reject) => {
             Promise.allSettled([initialSelect]).then((value) => {
                 const updateSQL = "UPDATE sessionlink SET isLocked=? WHERE username=? AND sessionID=?";
                 let lockVal;
@@ -437,9 +437,9 @@ class boat {
                     lockVal = 0
                 }
                 let updater = databaseHandler.queryDB(updateSQL, [lockVal, currentArr[index].username, sessionID]);
-                    Promise.allSettled([updater]).then((values) => {
-                        resolve();
-                    });
+                Promise.allSettled([updater]).then((values) => {
+                    resolve();
+                });
             })
         })
     }
@@ -463,11 +463,11 @@ class boat {
         pos1Arr[pos1Row] = pos2Arr[pos2Row];
         pos2Arr[pos2Row] = tempPaddler;
         const updateSQL = "UPDATE sessionLink SET tempSide=?, tempRow=? WHERE username=? AND sessionID=?";
-        let save1 = databaseHandler.queryDB(updateSQL, [pos2Side,pos2Row, pos2Arr[pos2Row].username, sessionID]);
-        let save2 = databaseHandler.queryDB(updateSQL, [pos1Side,pos1Row, pos1Arr[pos1Row].username, sessionID]);
+        let save1 = databaseHandler.queryDB(updateSQL, [pos2Side, pos2Row, pos2Arr[pos2Row].username, sessionID]);
+        let save2 = databaseHandler.queryDB(updateSQL, [pos1Side, pos1Row, pos1Arr[pos1Row].username, sessionID]);
 
-        return new Promise ((resolve, reject) => {
-            Promise.allSettled([save1,save2]).then((values) => {
+        return new Promise((resolve, reject) => {
+            Promise.allSettled([save1, save2]).then((values) => {
                 resolve();
             });
         });
@@ -480,14 +480,14 @@ class boat {
             const updateLeft = "UPDATE sessionLink SET tempSide='L', tempRow=? WHERE username=? AND sessionID=?";
             const updateRight = "UPDATE sessionLink SET tempSide='R', tempRow=? WHERE username=? AND sessionID=?";
             if (!this.left[row].isNull) {
-                promiseList[promiseList.length] = databaseHandler.queryDB(updateLeft, [row, this.left[row].username,sessionID]);
+                promiseList[promiseList.length] = databaseHandler.queryDB(updateLeft, [row, this.left[row].username, sessionID]);
             }
             if (!this.right[row].isNull) {
-                promiseList[promiseList.length] = databaseHandler.queryDB(updateRight, [row, this.right[row].username,sessionID]);
+                promiseList[promiseList.length] = databaseHandler.queryDB(updateRight, [row, this.right[row].username, sessionID]);
             }
         }
-        return new Promise ((resolve, reject) => {
-            Promise.allSettled(promiseList).then((values) => {          
+        return new Promise((resolve, reject) => {
+            Promise.allSettled(promiseList).then((values) => {
                 resolve();
             });
         });
@@ -511,8 +511,8 @@ function sessionToBoat(sessionID) {
     let paddlerList = databaseHandler.queryDB(getPaddlersSQL, [sessionID]);
     let isSaved = databaseHandler.queryDB(getIsSavedSQL, [sessionID]);
     return new Promise((resolve, reject) => {
-        Promise.allSettled([boatData, paddlerList,isSaved]).then((values) => {
-            let theBoat = new boat(values[0].value[0], values[1].value,values[2].value[0].designSaved);
+        Promise.allSettled([boatData, paddlerList, isSaved]).then((values) => {
+            let theBoat = new boat(values[0].value[0], values[1].value, values[2].value[0].designSaved);
             resolve(theBoat);
         });
     });
