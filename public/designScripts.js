@@ -37,3 +37,55 @@ function boxClicked(boxSide, boxIndex) {
   previouslyClicked = true;
 }
 }
+
+function lockClicked(side, index) {
+  const options = {
+    method: 'PATCH',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ "index": index, "side": side, "boat": boat })
+  }
+
+  fetch(window.location.href + "&type=lock", options)
+    .then(response => {
+      console.log("Response" + response);
+      return response.json();
+    }).then(data => {
+      // Work with JSON data here
+      console.log(data);
+      if (data.lockStatus = "OK") {
+        window.location.reload();
+      }
+    }).catch(err => {
+      // Do something for an error here
+      console.log("Error Reading data " + err);
+    });
+}
+
+function autoBalance() {
+  const options = {
+    method: 'PATCH',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({"boat": boat })
+  }
+
+  fetch(window.location.href + "&type=balance", options)
+    .then(response => {
+      console.log("Response" + response);
+      return response.json();
+    }).then(data => {
+      // Work with JSON data here
+      console.log(data);
+      if (data.balanceStatus = "OK") {
+        window.location.reload();
+      }
+    }).catch(err => {
+      // Do something for an error here
+      console.log("Error Reading data " + err);
+    });
+}

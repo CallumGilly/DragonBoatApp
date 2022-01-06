@@ -3,7 +3,7 @@ const db = require("./databaseHandler");
 
 //Define person object
 class person {
-    constructor (username=null, gender=null, weight=0, pref=null) {
+    constructor (username=null, gender=null, weight=0, pref=null, dbLocked=false) {
         if (username == null) {
             this.isNull = true;
         } else {
@@ -13,8 +13,13 @@ class person {
         this.gender = gender;
         this.perf =  pref;
         this.weight =  weight;
-        this.lockedSide = false;
-        this.lockedRow = false;
+        if (dbLocked == 1) {
+            dbLocked = true;
+        } else {
+            dbLocked = false;
+        }
+        this.lockedSide = dbLocked;
+        this.lockedRow = dbLocked;
     }
 
     valid () {

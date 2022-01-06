@@ -162,12 +162,27 @@ router.get('/boatDesign', (req,res) => {
             //Check to see if a session has been specified in the URL
             let designData = req.query;
             if (designData.sessionID !== undefined) {
-                let currentBoat = boat.sessionToBoat(designData.sessionID);
-                currentBoat.then((value) => {
-                    value.saveBoat(designData.sessionID).then(() => {
-                        res.render(`design`, {boat: value});
-                    });
+                //Check a boat is linked to the session  
+                const selectBoatSQL = "SELECT * FROM boatlink WHERE sessionID=?"
+                db.query(selectBoatSQL, [designData.sessionID], (err,result)=> {
+                    if (err) {
+                        throw err;
+                    }
+                    if(result.length == 0) {
+                        const getBoatListSQL = "SELECT * FROM boat";
+                        db.query(getBoatListSQL, [],(err, result) => {
+                            res.render(`pickBoat`, {boatList: result})
+                        })
+                    } else {
+                        let currentBoat = boat.sessionToBoat(designData.sessionID);
+                        currentBoat.then((value) => {
+                            value.saveBoat(designData.sessionID).then(() => {
+                                res.render(`design`, {boat: value, portStarboardAngle: value.calculatePortStarboardAngle(), bowSternAngle: value.calculateBowSternAngle(), PortStarboardMoment: value.PortStarboardMoment(), BowSternMoment: value.BowSternMoment()});
+                            });
+                        });
+                    }
                 });
+                
             } else {
                 let sqlStatement = "SELECT * FROM sessiontable WHERE sessionDate > UTC_DATE ORDER BY sessionDate ASC"
                 db.query(sqlStatement,[],(err, result) => {
@@ -187,6 +202,18 @@ router.get('/boatDesign', (req,res) => {
     // res.render(`design`, {data: {}});
 });
 
+router.put(`/boatDesign`, (req,res) => {
+    if (req.query.type == "setBoat") {
+        const setBoatSQL = "INSERT INTO boatlink (sessionID,boatID) VALUES (?, ?)";
+        db.query(setBoatSQL, [req.body.sessionID, req.body.selectedBoat], (err => {
+            if (err) {
+                throw err;
+            }
+            res.send({"setStatus": "OK"})
+        }))
+    }
+});
+
 router.patch('/boatDesign', (req,res) => {
     if (req.query.type == "swap") {
         boat.sessionToBoat(req.query.sessionID).then((value) => {
@@ -194,7 +221,20 @@ router.patch('/boatDesign', (req,res) => {
                 res.send({"swapStatus":"OK"});
             });
         });
-    } else {
+    } else if (req.query.type == "lock") {
+        boat.sessionToBoat(req.query.sessionID).then((value) => {
+            value.lockAndSave(req.query.sessionID, req.body.index, req.body.side).then(() => {
+                res.send({"lockStatus":"OK"});
+            })
+        })
+    } else if (req.query.type = "balance") {
+        boat.sessionToBoat(req.query.sessionID).then((value) => {
+            value.optimiseBoat();
+            value.saveBoat(req.query.sessionID).then(() => {
+                res.send({"balanceStatus":"OK"});
+            })
+        })
+    }else {
         res.send("Hello");
         console.log("Here");
     }

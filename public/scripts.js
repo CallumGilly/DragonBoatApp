@@ -1,3 +1,5 @@
+const { sessionToBoat } = require("../boat");
+
 //Check if a cookie exists, hide the sign out option if it does not
 if (document.cookie.substr(0,8) == "username") {
     document.getElementById(`signOut`).hidden = false;
@@ -29,4 +31,31 @@ function toggleMembership() {
 function validateSignup() {
     if (document.getElementById(`password`).value !== document.getElementById(`password`).value) {return false;}
     return true;
+}
+
+function linkBoat() {
+    const params = new URLSearchParams(window.location.search);
+    const options = {
+        method: 'PUT',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({"sessionID": params.get("sessionID"), "selectedBoat": document.forms[0].boatID.value})
+      }
+    
+      fetch(window.location.href + "&type=setBoat", options)
+        .then(response => {
+          console.log("Response" + response);
+          return response.json();
+        }).then(data => {
+          // Work with JSON data here
+          console.log(data);
+          if (data.setStatus = "OK") {
+            window.location.reload();
+          }
+        }).catch(err => {
+          // Do something for an error here
+          console.log("Error Reading data " + err);
+        });
 }
