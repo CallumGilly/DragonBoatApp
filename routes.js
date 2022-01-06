@@ -108,15 +108,22 @@ router.post(`/login`, (req,res) => {
 
 //Handle member area requests
 router.get(`/members`, (req,res) => {
-    checkUsernameCookie(req.signedCookies.username,0, (cookieData) => {
+    checkUsernameCookie(req.signedCookies.username, 1, (cookieData) => {
         if (cookieData.valid) {
-            //Render the members area if the cookie is valid
-            res.render(`members`, {data: {fname: cookieData.result.firstName}})
+            res.render(`members`, {data: {fname: cookieData.result.firstName}, privilegeLevel: 1});
         } else {
-            // If the user cookie is not in the database then clear cookies and make them login again
-            res.clearCookie(`username`).render(`login`, {data: {error: `Signed Out`}});
+            checkUsernameCookie(req.signedCookies.username,0, (cookieData) => {
+                if (cookieData.valid) {
+                    //Render the members area if the cookie is valid
+                    res.render(`members`, {data: {fname: cookieData.result.firstName}, privilegeLevel: 0});
+                } else {
+                    // If the user cookie is not in the database then clear cookies and make them login again
+                    res.clearCookie(`username`).render(`login`, {data: {error: `Signed Out`}});
+                }
+            });
         }
-    });
+    })
+    
 });
 
 router.get(`/errorpage`, (req,res) => {
