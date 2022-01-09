@@ -3,7 +3,9 @@
     <h1> Hello <%= data.fname %> </h1>
     <p>Welcome to your user area</p>
 
-    <% if (privilegeLevel == 1) { %>
+    <p>Book onto an upcoming session <a href="/booking">Here</a></p>
+
+    <% if (privilegeLevel >= 1) { %>
         Set up boat designs for upcoming sessions <a href="/boatDesign">Here</a>
     <% } %>
 <%- include('footer') -%> 

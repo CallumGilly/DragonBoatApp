@@ -5,12 +5,14 @@ const dotenv = require(`dotenv`).config();
 const crypto = require(`crypto`);
 const e = require("express");
 //Homemade modules
+const dbHandler = require("./databaseHandler");
 const person = require("./person")
 const boat = require("./boat");
 //Automatic modules
 const { threadId } = require("worker_threads");
 const { create } = require("domain");
 const { DESTRUCTION } = require("dns");
+const { redirect } = require("express/lib/response");
 
 //Create a router object
 const router = express.Router()
@@ -361,6 +363,98 @@ function signupCheck(linkID, updateFlag, callback) {
     });
 }
 
+router.get("/booking", (req,res) => {
+    checkUsernameCookie(req.signedCookies.username,0, (cookieData) => {
+        if (cookieData.valid) {
+            //Get data about the upcoming sessions
+            const sessionStatement = "SELECT * FROM ((sessiontable INNER JOIN boatlink ON boatlink.sessionID=sessiontable.sessionID) INNER JOIN boat ON boatlink.boatID=boat.boatID) WHERE sessionDate > UTC_DATE ORDER BY sessionDate ASC";
+            const paddlersBooked = "SELECT sessionID,COUNT(username) FROM sessionlink GROUP BY sessionID"
+            //Get the count for every session
+            let queryList = [];
+            queryList[queryList.length] = dbHandler.queryDB(sessionStatement, []);
+            queryList[queryList.length] = dbHandler.queryDB(paddlersBooked, []);
+            Promise.allSettled(queryList).then(value => {
+                //Render the booking area if the cookie is valid with data about the upcoming sessions
+                res.render("booking", {sessionsData: value, prevSession: null});
+            });
+
+        } else {
+            // If the user cookie is not in the database then clear cookies and make them login again
+            res.clearCookie(`username`).render(`login`, {data: {error: `Signed Out`}});
+        }
+    });
+});
+
+router.patch("/booking", (req,res) => {
+    checkUsernameCookie(req.signedCookies.username,0, (cookieData) => {
+    const sqlStatement = "SELECT * FROM (((sessiontable INNER JOIN sessionlink ON sessiontable.sessionID=sessionlink.sessionID) INNER JOIN boatlink ON boatlink.sessionID=sessiontable.sessionID) INNER JOIN boat ON boat.boatID=boatlink.boatID) INNER JOIN paddlertable ON sessionlink.username=paddlertable.username WHERE sessionlink.sessionID=?"
+        db.query(sqlStatement, [req.body.sessionID], (err,results) => {
+            if (err) {
+                throw err;
+            }
+            console.log(cookieData.result);
+            res.send({sessionData: results, username: cookieData.result.username});
+        });
+    });
+});
+
+router.post("/booking", (req,res) => {
+    //find the username from the cookie
+    const checkCookieSQL = `SELECT username FROM cookietable WHERE cookie=?`;
+    const paddlersBookedSQL = "SELECT COUNT(username) FROM sessionlink WHERE sessionID=?";
+    const maxSeatsSQL = `SELECT boatSize FROM boat INNER JOIN boatlink ON boat.boatID=boatlink.boatID WHERE boatlink.sessionID=?`;
+    let checkCookie = dbHandler.queryDB(checkCookieSQL, [req.signedCookies.username]);
+    let paddlersBooked = dbHandler.queryDB(paddlersBookedSQL, [req.body.sessionID]);
+    let maxSeats = dbHandler.queryDB(maxSeatsSQL, [req.body.sessionID]);
+    Promise.allSettled([checkCookie,paddlersBooked,maxSeats]).then(value => {
+        // console.log(`username: ${value[0].value[0].username}, placesTaken: ${Object.values(value[1].value[0])[0]}, maxSeats: ${value[2].value[0].boatSize}`)
+        if (Object.values(value[1].value[0])[0] < value[2].value[0].boatSize) {
+            const alreadyBookedSQL = `SELECT * FROM sessionlink WHERE username=? AND sessionID=?`;
+            db.query(alreadyBookedSQL, [value[0].value[0].username,req.body.sessionID], (err,result) => {
+                if (result.length == 0) {
+                    const bookSessionSQL = `INSERT INTO sessionlink (username, sessionID) VALUES (?, ?)`;
+                    db.query(bookSessionSQL, [value[0].value[0].username, req.body.sessionID], (err) => {
+                        if (err) {
+                            throw err;
+                        }
+                        //Get data about the upcoming sessions
+                        const sessionStatement = "SELECT * FROM ((sessiontable INNER JOIN boatlink ON boatlink.sessionID=sessiontable.sessionID) INNER JOIN boat ON boatlink.boatID=boat.boatID) WHERE sessionDate > UTC_DATE ORDER BY sessionDate ASC";
+                        const paddlersBooked = "SELECT sessionID,COUNT(username) FROM sessionlink GROUP BY sessionID"
+                        //Get the count for every session
+                        let queryList = [];
+                        queryList[queryList.length] = dbHandler.queryDB(sessionStatement, []);
+                        queryList[queryList.length] = dbHandler.queryDB(paddlersBooked, []);
+                        Promise.allSettled(queryList).then(value => {
+                            //Render the booking area if the cookie is valid with data about the upcoming sessions
+                            res.render("booking", {sessionsData: value, prevSession: req.body.sessionID});
+                        });
+                    });
+                }
+            });
+        }
+    });
+});
+
+router.delete("/booking", (req,res) => {
+    const delLinkSQL = "DELETE FROM sessionlink WHERE username=? AND sessionID=?";
+    db.query(delLinkSQL, [req.body.username,req.body.sessionID], (err,result) => {
+        if (err) {
+            throw err;
+        }
+        //Get data about the upcoming sessions
+        const sessionStatement = "SELECT * FROM ((sessiontable INNER JOIN boatlink ON boatlink.sessionID=sessiontable.sessionID) INNER JOIN boat ON boatlink.boatID=boat.boatID) WHERE sessionDate > UTC_DATE ORDER BY sessionDate ASC";
+        const paddlersBooked = "SELECT sessionID,COUNT(username) FROM sessionlink GROUP BY sessionID"
+        //Get the count for every session
+        let queryList = [];
+        queryList[queryList.length] = dbHandler.queryDB(sessionStatement, []);
+        queryList[queryList.length] = dbHandler.queryDB(paddlersBooked, []);
+        Promise.allSettled(queryList).then(value => {
+            //Render the booking area if the cookie is valid with data about the upcoming sessions
+            res.render("booking", {sessionsData: value, prevSession: req.body.sessionID});
+        });
+    });
+});
+
 function getTodayDate() {
     let currentDate = new Date();
     return `${currentDate.getUTCFullYear()}-${currentDate.getUTCMonth()}-${currentDate.getUTCDate()}`
@@ -378,7 +472,7 @@ function genRandomString(length, minNum = 33) { //Generate a string of a set len
 
 function checkUsernameCookie(usernameCookie, minPrivilege, callback) { //Check if a cookie is valid
     //Define sql statement to be used
-    let sqlStatement = `SELECT privilegeLevel FROM paddlertable INNER JOIN cookietable ON paddlertable.username = cookietable.username WHERE cookietable.cookie=?`
+    let sqlStatement = `SELECT privilegeLevel, cookietable.username FROM paddlertable INNER JOIN cookietable ON paddlertable.username = cookietable.username WHERE cookietable.cookie=?`
         
     //Query the database with the username cookie
     db.query(sqlStatement, [usernameCookie], (err,result) => {
