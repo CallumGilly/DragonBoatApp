@@ -47,11 +47,11 @@
             </div>
         </div>
     </div>
+    <script src="/public/bookingScripts.js"></script>
     <% if (prevSession !== null) { %>
         <script>
             console.log(<%=prevSession%>);
             sessionClicked(<%=prevSession%>);
         </script>
     <%}%>
-    <script src="/public/bookingScripts.js"></script>
 <%- include('footer') -%> 
