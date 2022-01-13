@@ -182,7 +182,7 @@ router.get('/boatDesign', (req,res) => {
                         const getBoatListSQL = "SELECT * FROM boat";
                         db.query(getBoatListSQL, [],(err, result) => {
                             res.render(`pickBoat`, {boatList: result})
-                        })
+                        });
                     } else {
                         let currentBoat = boat.sessionToBoat(designData.sessionID);
                         currentBoat.then((value) => {
@@ -468,7 +468,37 @@ router.delete("/booking", (req,res) => {
 });
 
 router.get("/makeSession", (req,res) => {
-    res.render("makeSession")
+    checkUsernameCookie(req.signedCookies.username,1, (cookieData) => {
+        if (cookieData.valid == true) {
+            //If the cookie data is valid render the make session page
+            res.render("makeSession")
+        } else {
+            // If the user cookie is not in the database then clear cookies and make them login again
+            //TODO: Log this
+            res.clearCookie(`username`).render(`login`, {data: {error: `Invalid Privilege level or signed out, this will be logged`}});
+        }
+    });
+});
+
+router.post("/makeSession", (req,res) => {
+    checkUsernameCookie(req.signedCookies.username,1, (cookieData) => {
+        if (cookieData.valid == true) {
+            const insertionSQL = "INSERT INTO sessiontable (sessionDate, Description) VALUES(?, ?)";
+            db.query(insertionSQL, [req.body.sessionDate, req.body.sessionDescription], (err) => {
+                if (err) {
+                    throw err;
+                }
+                const getSessionID = "SELECT sessionID FROM sessiontable where sessionDate=?";
+                db.query(getSessionID, [req.body.sessionDate], (err,results) => {
+                    res.redirect("/boatDesign?sessionID=" + results[0].sessionID);
+                })
+            })
+        } else {
+            // If the user cookie is not in the database then clear cookies and make them login again
+            //TODO: Log this
+            res.clearCookie(`username`).render(`login`, {data: {error: `Invalid Privilege level or signed out, this will be logged`}});
+        }
+    });
 });
 
 function getTodayDate() {
