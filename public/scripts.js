@@ -1,5 +1,3 @@
-const { sessionToBoat } = require("../boat");
-
 //Check if a cookie exists, hide the sign out option if it does not
 if (document.cookie.substr(0,8) == "username") {
     document.getElementById(`signOut`).hidden = false;

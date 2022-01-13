@@ -1,0 +1,21 @@
+<%- include('header') -%>
+    <!-- Bootstrap learned from https://www.w3schools.com/bootstrap5/bootstrap_forms.php -->
+    <div class="card mt-4 p-2">
+        <div class="card-body">
+            <form method="POST" action="/makeSession">
+                <h3>Make Session</h3>
+                <div class="mb-3 mt-3">
+                    <div class="required-field"><label for="sessionDate">Session Date</label></div>
+                    <input class="form-control" type="datetime-local" name="sessionDate" id="sessionDate">
+                </div>
+                <div class="mb-3 mt-3">
+                    <div class="required-field"><label for="sessionDescription">Session Description</label></div>
+                    <input class="form-control" type="text" name="sessionDescription" id="sessionDescription">
+                </div>
+                <div>
+                    <button class="btn btn-primary" type="submit">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+<%- include('footer') -%> 

@@ -1,5 +1,23 @@
 <%- include('header') -%>
-
+    <% if (data.message != undefined) { %>
+        <!-- Toast by W3Schools Bootstrap then modified -->
+        <div class="toast show">
+            <div class="toast-header .text-warning">
+                Sever Message:
+                <button type="button" class="btn-close" data-bs-dismiss="toast"></button>
+            </div>
+            <div class="toast-body">
+                <%=data.message%>
+            </div>
+        </div>
+    <% } %>
     <h1> Hello <%= data.fname %> </h1>
     <p>Welcome to your user area</p>
+
+    <p>Book onto an upcoming session <a href="/booking">Here</a></p>
+
+    <% if (privilegeLevel >= 1) { %>
+        <p>Set up boat designs for upcoming sessions <a href="/boatDesign">Here</a></p>
+        <p>Create a new session <a href="/makeSession">Here</a></p>
+    <% } %>
 <%- include('footer') -%> 

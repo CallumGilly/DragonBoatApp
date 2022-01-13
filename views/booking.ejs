@@ -1,0 +1,57 @@
+<%- include('header') -%>
+    <div class="row">
+        <div class="col-lg-4 p-3">
+            <h2>Upcoming Sessions</h2>
+            <div class="list-group">
+                <% for( let index = 0; index < sessionsData[0].value.length; index++ ) { %>
+                    <a class="list-group-item list-group-item-action" onclick="sessionClicked(<%=sessionsData[0].value[index].sessionID%>)">
+                        <div class="row">
+                            <div class="col-sm-6"><h5><%- sessionsData[0].value[index].boatName %> </h5></div>
+                            <div class="col-sm-6 d-flex justify-content-end"><h6><%- sessionsData[0].value[index].sessionDate.toString().substring(0,21) %></h6></div>
+                        </div>
+                        <div class="row">
+                            <%let count = 0;%>
+                            <% sessionsData[1].value.forEach(element => { %>
+                                <% if (element.sessionID == sessionsData[0].value[index].sessionID) { %>
+                                    <% count = Object.values(element)[1] %>                                   
+                                <% } %>
+                            <% }) %>
+                            <div class="col-sm-6"><h6><%-count%> / <%-sessionsData[0].value[index].boatSize%> Paddlers</h6></div>
+                            <div class="col-sm-6 d-flex justify-content-end" ><h6><%-sessionsData[0].value[index].helm%></h6></div>
+                        </div>
+                    </a>
+                <% } %>
+            </div>
+        </div>
+        <div class="col-lg-8 p-5" id="sessionPanel" hidden="true">
+            <div class="row">
+                <div class="col-sm-8">
+                    <table class="table" id="paddlerTable">
+                        <thead>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                        </thead>
+                    </table>
+                </div>
+                <div class="col-sm-4">
+                    <h6>Total Seats:</h6> <p style="margin-bottom: 0px;" id="totalSeats"></p>
+                    <h6>Helm:</h6> <p style="margin-bottom: 0px;" id="helmName"></p>
+                    <h6>Session Description:</h6> <p style="margin-bottom: 0px;" id="description"></p>
+                    <div class="card-body">
+                        <form method="post" action="/booking" class="d-flex justify-content-center">
+                            <input id="sessionID" name="sessionID" readonly hidden></input>
+                            <button class="btn btn-primary" type="submit" id="submit">Join</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/public/bookingScripts.js"></script>
+    <% if (prevSession !== null) { %>
+        <script>
+            console.log(<%=prevSession%>);
+            sessionClicked(<%=prevSession%>);
+        </script>
+    <%}%>
+<%- include('footer') -%> 
