@@ -11,13 +11,46 @@
             </div>
         </div>
     <% } %>
-    <h1> Hello <%= data.fname %> </h1>
-    <p>Welcome to your user area</p>
+    <h1 class="pt-2"> User area </h1>
+    <p>Welcome to your user area, select an option below to continue</p>
+    <div class="row">
+        <div class="col-md-4 pt-3">
+            <a href="/booking"><img class="card-img-top" src="/public/img/bookingImg.jpg" alt="Card image"></a>
+            <div class="card" style="width:100%">
+                <div class="card-body">
+                    <h4 class="card-title">Booking</h4>
+                    <p class="card-text">Book onto an upcoming session</p>
+                    <a href="/booking" class="btn btn-primary">Book</a>
+                </div>
+            </div>
+        </div>
+        <% if (privilegeLevel >= 1) { %>
+            <div class="col-md-4 pt-3">
+                <div class="card" style="width:100%">
+                    <a href="/boatDesign"><img class="card-img-top" src="/public/img/dragonBoatAtNight.jpg" alt="Card image"></a>
+                    <div class="card-body">
+                        <h4 class="card-title">Boat Design</h4>
+                        <p class="card-text">Plan the boat for upcoming session and view details about who's paddling</p>
+                        <a href="/boatDesign" class="btn btn-primary">Design</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 pt-3">
+                <div class="card" style="width:100%">
+                    <a href="/makeSession"><img class="card-img-top" src="/public/img/boatCartoon1Img.jpg" alt="Card image"></a>
+                    <div class="card-body">
+                        <h4 class="card-title">Make session</h4>
+                        <p class="card-text">Make sessions which can be booked onto by paddlers</p>
+                        <a href="/makeSession" class="btn btn-primary">Create</a>
+                    </div>
+                </div>
+            </div>
+        <% } %>
+    </div>
+    
 
-    <p>Book onto an upcoming session <a href="/booking">Here</a></p>
-
-    <% if (privilegeLevel >= 1) { %>
-        <p>Set up boat designs for upcoming sessions <a href="/boatDesign">Here</a></p>
-        <p>Create a new session <a href="/makeSession">Here</a></p>
-    <% } %>
+    
+        
+        
+    
 <%- include('footer') -%> 
