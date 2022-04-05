@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 14, 2022 at 10:07 AM
+-- Generation Time: Apr 05, 2022 at 07:29 PM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 7.3.31
 
@@ -60,10 +60,12 @@ CREATE TABLE `boatlink` (
 
 INSERT INTO `boatlink` (`sessionID`, `boatID`) VALUES
 (5, 2),
+(6, 1),
 (7, 1),
 (8, 1),
 (11, 1),
-(13, 1);
+(13, 1),
+(15, 1);
 
 -- --------------------------------------------------------
 
@@ -107,17 +109,44 @@ CREATE TABLE `cookietable` (
 --
 
 INSERT INTO `cookietable` (`username`, `cookie`, `dateMade`) VALUES
+('Coach1', '/3m1MC%>@DC-$7cONwl_g\\k{IV+HRx*szF\"K{2Js}Wh8xPO$6=PHz\".owORS`', '2022-01-14'),
 ('Coach1', '2[Ojv^lo{$eOI/50qO_Y_P|a*t-/P.BL`}\'b8pk/K8+#hecNSm$Hz&Oqm|>q:', '2022-01-07'),
+('Coach1', '5E|9gKabB\\w^\']^Wn\'K\'9d!zFz0)+7b)-C\"hrQ{I\"e#Y=FIdh*HNOKvoI5QEF', '2022-03-15'),
 ('Coach1', '=>mC02@p-|m0b7m{b|iTO-41pch8NB]wKH(<lVn(nK)Q_eH$og|6Q4&y|`XT6', '2022-01-01'),
 ('Coach1', 'ct,yO)5n#$\\\'sX6\"8O`6AD2hF..2Ka`^7\"M`bqLoWJH4aFkI64o%a5Vy,eeeP', '2022-01-05'),
 ('Coach1', 'e9h}:*99nx6tuB5m!\"w7nlLh-8EIs0D?@)`jb!F8=.w!`m$.W[OGXwInW,pE-', '2022-01-09'),
 ('Coach1', 'LLBhec8W@Y:Si,=U$wo\\Md7>;N^5h^ZA00CYKp|}exA#8.BUZHS|8B!?v*yHR', '2022-01-07'),
+('Coach1', 'lmu<A{mS18EK)\\|A0wF=|R\\7T]rdp.!(sBkVpTFZVG*$B2zCP\'A.Q;YW{UC]$', '2022-03-15'),
 ('Coach1', 'OYA|#^rW_Lk\'rKxI}{OzzP)cx+Jl4k`5paygnEM?Uc{g_k7#_S\'xYco!5uRdV', '2022-01-05'),
+('Coach1', 'P3ZK,*L+$ruUc#U`d>PgEl}jti1$,HRFXOb@EtJR{#]i8Tt}_qiHZVV&9{W-#', '2022-03-15'),
 ('Coach1', 'qlw_--07T;qgiBG.6,+h<3(C\\=pwFzxOSj\'OE\'?>ke@y_a%T<gh9(32Vv(]lt', '2022-01-06'),
 ('Coach1', '_No^4\"?o9Pl#\"86/@Cdm=hMW\"y*JRBB2MKeTOYgs=\'PmO:2bN21193#scTp;q', '2022-01-13'),
+('paddler1', '/<ena$^V)lAShaDd8$0\"f.pwa*J8lS?FXTAIaRv%uWkkGe]tZadDB#(NZ.5_O', '2022-03-15'),
+('paddler1', '0NSW8hM8s!u:Rv_9WA_SeJ++Xo8!%v(HK_FkHu1[DS!c[Ox(fAv$8}uQD;vum', '2022-03-15'),
 ('paddler1', '5EM!@QIj@&9if0sj4LP\"fFQz:r`4X6`C\"Mz)EAU_0jF.$!2c[fOw_!q5\'G@cj', '2022-01-05'),
+('paddler1', 'AP.zk#1R}Nn>>xM,EIMv^OXyP0MjlINtD(j.w`xX`f&%K+J]Su7p>x7oUa<$C', '2022-01-14'),
 ('paddler1', 'L7@Y?n,w(B,tf}**OBV\'vCzS=TN4iY5XfSux\"ZWU9}n!LXwK%0r@GD<ja&0`\\', '2022-01-09'),
-('paddler1', 'qnM;o}A{&It2K,4,>fz$-#&tPmf*\'uE}:z9Q|Je{I[C8(b4?NN*kesk\';_zfe', '2021-12-30');
+('paddler1', 'qnM;o}A{&It2K,4,>fz$-#&tPmf*\'uE}:z9Q|Je{I[C8(b4?NN*kesk\';_zfe', '2021-12-30'),
+('paddler1', 'Zrq5og`S-Kh3)UJ#g1S[o[Vp^9Z;dvMP2s7Dv!#h{+vfqE|.P5(2,G&-n;q94', '2022-03-15');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `location`
+--
+
+CREATE TABLE `location` (
+  `locationName` varchar(255) NOT NULL,
+  `longitude` float NOT NULL,
+  `latitude` float NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+--
+-- Dumping data for table `location`
+--
+
+INSERT INTO `location` (`locationName`, `longitude`, `latitude`) VALUES
+('SilverWing', -0.54, 51.44);
 
 -- --------------------------------------------------------
 
@@ -158,9 +187,9 @@ CREATE TABLE `paddlertable` (
 
 INSERT INTO `paddlertable` (`username`, `firstName`, `lastName`, `weight`, `weightLastUpdate`, `gender`, `password`, `privilegeLevel`, `BDAMemberShipNum`, `BDAExpiry`, `preference`) VALUES
 ('Coach1', 'Coach', 'One', NULL, NULL, 1, '1d707811988069ca760826861d6d63a10e8c3b7f171c4441a6472ea58c11711b', 1, NULL, NULL, NULL),
+('DavidRandle', 'paddler', '2', 105, '2021-12-12', 1, '1d707811988069ca760826861d6d63a10e8c3b7f171c4441a6472ea58c11711b', 0, NULL, NULL, NULL),
+('Nigel Bedford', 'paddler', '3', 80, '2021-12-12', 1, '1d707811988069ca760826861d6d63a10e8c3b7f171c4441a6472ea58c11711b', 0, NULL, NULL, NULL),
 ('paddler1', 'paddler', '1', 50, '2021-12-12', 1, '1d707811988069ca760826861d6d63a10e8c3b7f171c4441a6472ea58c11711b', 0, NULL, NULL, NULL),
-('paddler2', 'paddler', '2', 51, '2021-12-12', 1, '1d707811988069ca760826861d6d63a10e8c3b7f171c4441a6472ea58c11711b', 0, NULL, NULL, NULL),
-('paddler3', 'paddler', '3', 52, '2021-12-12', 1, '1d707811988069ca760826861d6d63a10e8c3b7f171c4441a6472ea58c11711b', 0, NULL, NULL, NULL),
 ('paddler4', 'paddler', '4', 54, '2021-12-12', 2, '1d707811988069ca760826861d6d63a10e8c3b7f171c4441a6472ea58c11711b', 0, NULL, NULL, NULL),
 ('paddler5', 'paddler', '5', 55, '2021-12-12', 2, '1d707811988069ca760826861d6d63a10e8c3b7f171c4441a6472ea58c11711b', 0, NULL, NULL, NULL),
 ('paddler6', 'paddler', '6', 56, '2021-12-12', 1, '1d707811988069ca760826861d6d63a10e8c3b7f171c4441a6472ea58c11711b', 0, NULL, NULL, NULL);
@@ -184,13 +213,13 @@ CREATE TABLE `sessionlink` (
 --
 
 INSERT INTO `sessionlink` (`username`, `sessionID`, `tempSide`, `tempRow`, `isLocked`) VALUES
-('paddler1', 5, NULL, NULL, 0),
+('Coach1', 6, NULL, NULL, 0),
+('DavidRandle', 5, 'L', 3, 1),
+('Nigel Bedford', 5, 'R', 3, 1),
 ('paddler1', 8, 'L', 0, 0),
-('paddler2', 5, 'R', 0, 1),
-('paddler3', 5, 'R', 9, 0),
-('paddler4', 5, 'L', 9, 0),
-('paddler5', 5, 'L', 0, 1),
-('paddler6', 5, 'R', 3, 0),
+('paddler4', 5, 'R', 5, 0),
+('paddler5', 5, 'R', 4, 1),
+('paddler6', 5, 'L', 4, 1),
 ('paddler6', 6, 'L', 0, 0);
 
 -- --------------------------------------------------------
@@ -204,24 +233,26 @@ CREATE TABLE `sessiontable` (
   `sessionDate` datetime NOT NULL,
   `Description` text NOT NULL,
   `designSaved` tinyint(1) NOT NULL DEFAULT 0,
-  `helm` varchar(255) DEFAULT NULL
+  `helm` varchar(255) DEFAULT NULL,
+  `locationName` varchar(255) NOT NULL DEFAULT 'SilverWing'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `sessiontable`
 --
 
-INSERT INTO `sessiontable` (`sessionID`, `sessionDate`, `Description`, `designSaved`, `helm`) VALUES
-(5, '2022-05-31 16:11:32', 'Test session', 1, 'Coach1'),
-(6, '2022-01-18 12:00:21', 'Session In the future\r\n', 1, NULL),
-(7, '2022-01-06 12:02:38', 'Session on the sixth', 1, NULL),
-(8, '2022-01-31 12:03:08', 'A session for dragon boating', 1, NULL),
-(9, '2022-01-13 13:08:00', 'dasfasdf', 0, NULL),
-(10, '2022-01-11 13:19:00', 'dasfasdf', 0, NULL),
-(11, '2022-01-27 13:24:00', 'A test for session creation', 1, NULL),
-(12, '2022-01-26 13:27:00', 'Session Creation Test', 0, NULL),
-(13, '2022-01-30 15:21:00', 'home test session', 1, NULL),
-(14, '2022-03-02 15:30:00', 'Session Creation Test', 0, NULL);
+INSERT INTO `sessiontable` (`sessionID`, `sessionDate`, `Description`, `designSaved`, `helm`, `locationName`) VALUES
+(5, '2022-05-31 16:11:32', 'Test session', 1, 'Coach1', 'SilverWing'),
+(6, '2022-04-06 12:00:21', 'Session In the future\r\n', 1, NULL, 'SilverWing'),
+(7, '2022-01-06 12:02:38', 'Session on the sixth', 1, NULL, 'SilverWing'),
+(8, '2022-01-31 12:03:08', 'A session for dragon boating', 1, NULL, 'SilverWing'),
+(9, '2022-01-13 13:08:00', 'dasfasdf', 0, NULL, 'SilverWing'),
+(10, '2022-01-11 13:19:00', 'dasfasdf', 0, NULL, 'SilverWing'),
+(11, '2022-01-27 13:24:00', 'A test for session creation', 1, NULL, 'SilverWing'),
+(12, '2022-01-26 13:27:00', 'Session Creation Test', 0, NULL, 'SilverWing'),
+(13, '2022-01-30 15:21:00', 'home test session', 1, NULL, 'SilverWing'),
+(14, '2022-03-02 15:30:00', 'Session Creation Test', 0, NULL, 'SilverWing'),
+(15, '2022-03-18 00:12:00', 'edfcef3ce', 1, NULL, 'SilverWing');
 
 -- --------------------------------------------------------
 
@@ -302,6 +333,12 @@ ALTER TABLE `cookietable`
   ADD PRIMARY KEY (`username`,`cookie`);
 
 --
+-- Indexes for table `location`
+--
+ALTER TABLE `location`
+  ADD PRIMARY KEY (`locationName`);
+
+--
 -- Indexes for table `medicaltable`
 --
 ALTER TABLE `medicaltable`
@@ -327,7 +364,8 @@ ALTER TABLE `sessionlink`
 ALTER TABLE `sessiontable`
   ADD PRIMARY KEY (`sessionID`),
   ADD KEY `sessionDate` (`sessionDate`),
-  ADD KEY `helm` (`helm`);
+  ADD KEY `helm` (`helm`),
+  ADD KEY `locationName` (`locationName`);
 
 --
 -- Indexes for table `signuplinks`
@@ -369,7 +407,7 @@ ALTER TABLE `medicaltable`
 -- AUTO_INCREMENT for table `sessiontable`
 --
 ALTER TABLE `sessiontable`
-  MODIFY `sessionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `sessionID` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- Constraints for dumped tables
@@ -412,7 +450,8 @@ ALTER TABLE `sessionlink`
 -- Constraints for table `sessiontable`
 --
 ALTER TABLE `sessiontable`
-  ADD CONSTRAINT `sessiontable_ibfk_1` FOREIGN KEY (`helm`) REFERENCES `paddlertable` (`username`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `sessiontable_ibfk_1` FOREIGN KEY (`helm`) REFERENCES `paddlertable` (`username`) ON DELETE CASCADE ON UPDATE CASCADE,
+  ADD CONSTRAINT `sessiontable_ibfk_2` FOREIGN KEY (`locationName`) REFERENCES `location` (`locationName`);
 
 --
 -- Constraints for table `signuplinks`
