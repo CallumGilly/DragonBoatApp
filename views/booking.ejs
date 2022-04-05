@@ -45,18 +45,15 @@
                             </form>
                         </div>
                     </div>
-                    <%try{ %>
-                        <div class="p-3 rounded border border-info">
-                            <h3>Weather</h3>
-                            <p>Min Temp: <%= weatherData.daily.temperature_2m_min[weatherPos] %><%=weatherData.daily_units.temperature_2m_min %></p>
-                            <p>Max Temp: <%= weatherData.daily.temperature_2m_max[weatherPos] %><%=weatherData.daily_units.temperature_2m_max %></p>
-                            <p>Max Windspeed: <%= weatherData.daily.windspeed_10m_max[weatherPos]%><%=weatherData.daily_units.windspeed_10m_max %></p>
-                            <p>Max Gusts: <%= weatherData.daily.windgusts_10m_max[weatherPos]%><%=weatherData.daily_units.windgusts_10m_max %></p>
-                            <p>Rainfall: <%= weatherData.daily.precipitation_sum[weatherPos]%> <%=weatherData.daily_units.precipitation_sum%></p>
-                        </div>
-                    <% } catch (err) { %>
-                        Weather not available <%= err %>
-                    <% } %>
+                    <div class="p-3 rounded border border-info" hidden="true" id="WeatherBox">
+                        <h3>Weather</h3>
+                        <p id="minTemp"></p>
+                        <p id="maxTemp"></p>
+                        <p id="maxWindspeed"></p>
+                        <p id="maxGusts"></p>
+                        <p id="Rainfall"></p>
+                        <p><a class="small" href="https://open-meteo.com/en">Powered by OpenMetro</a></p>
+                    </div>
                         
                 </div>
             </div>
