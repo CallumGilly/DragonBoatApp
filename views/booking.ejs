@@ -34,15 +34,30 @@
                     </table>
                 </div>
                 <div class="col-sm-4">
-                    <h6>Total Seats:</h6> <p style="margin-bottom: 0px;" id="totalSeats"></p>
-                    <h6>Helm:</h6> <p style="margin-bottom: 0px;" id="helmName"></p>
-                    <h6>Session Description:</h6> <p style="margin-bottom: 0px;" id="description"></p>
-                    <div class="card-body">
-                        <form method="post" action="/booking" class="d-flex justify-content-center">
-                            <input id="sessionID" name="sessionID" readonly hidden></input>
-                            <button class="btn btn-primary" type="submit" id="submit">Join</button>
-                        </form>
+                    <div>
+                        <h6>Total Seats:</h6> <p style="margin-bottom: 0px;" id="totalSeats"></p>
+                        <h6>Helm:</h6> <p style="margin-bottom: 0px;" id="helmName"></p>
+                        <h6>Session Description:</h6> <p style="margin-bottom: 0px;" id="description"></p>
+                        <div class="card-body">
+                            <form method="post" action="/booking" class="d-flex justify-content-center">
+                                <input id="sessionID" name="sessionID" readonly hidden></input>
+                                <button class="btn btn-primary" type="submit" id="submit">Join</button>
+                            </form>
+                        </div>
                     </div>
+                    <%try{ %>
+                        <div class="p-3 rounded border border-info">
+                            <h3>Weather</h3>
+                            <p>Min Temp: <%= weatherData.daily.temperature_2m_min[weatherPos] %><%=weatherData.daily_units.temperature_2m_min %></p>
+                            <p>Max Temp: <%= weatherData.daily.temperature_2m_max[weatherPos] %><%=weatherData.daily_units.temperature_2m_max %></p>
+                            <p>Max Windspeed: <%= weatherData.daily.windspeed_10m_max[weatherPos]%><%=weatherData.daily_units.windspeed_10m_max %></p>
+                            <p>Max Gusts: <%= weatherData.daily.windgusts_10m_max[weatherPos]%><%=weatherData.daily_units.windgusts_10m_max %></p>
+                            <p>Rainfall: <%= weatherData.daily.precipitation_sum[weatherPos]%> <%=weatherData.daily_units.precipitation_sum%></p>
+                        </div>
+                    <% } catch (err) { %>
+                        Weather not available <%= err %>
+                    <% } %>
+                        
                 </div>
             </div>
         </div>

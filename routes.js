@@ -3,6 +3,10 @@ const express = require(`express`);
 const mysql = require(`mysql`);
 const dotenv = require(`dotenv`).config();
 const crypto = require(`crypto`);
+
+//Require fetch
+const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
+
 //Homemade modules
 const dbHandler = require("./databaseHandler");
 const boat = require("./boat");
@@ -276,10 +280,37 @@ router.patch("/booking", (req,res) => {
             if (err) {
                 throw err;
             }
-            res.send({sessionData: results, username: cookieData.result.username});
+            getWeather(results[0].sessionDate).then(myData => {
+                let index = -1;
+                for (var x = 0; x < myData.daily.time.length; x++) {
+                    let theDate = new Date(myData.daily.time[x]);
+                    if (theDate.getDate() == results[0].sessionDate.getDate() && theDate.getMonth() == results[0].sessionDate.getMonth() && theDate.getFullYear() == results[0].sessionDate.getFullYear()) {
+                        console.log("indexFound");
+                        index = x;
+                    }
+                    
+                }
+                console.log(index);
+                if (index >= -1) {
+                    res.send({sessionData: results, username: cookieData.result.username, weatherData: myData, weatherPos: index});
+                } else {
+                    res.send({sessionData: results, username: cookieData.result.username});
+                }
+                
+            });
         });
     });
 });
+
+async function getWeather(sessionDate) {
+    //Get Weather Data
+    let apiRequest = "https://api.open-meteo.com/v1/forecast?latitude=51.447&longitude=-0.5487&daily=weathercode,temperature_2m_max,temperature_2m_min,precipitation_hours,windspeed_10m_max,windgusts_10m_max,winddirection_10m_dominant&windspeed_unit=kn&timezone=Europe%2FLondon";
+    // let cleanSessionData = sessionDate.toISOString().substring(0,9);
+    // console.log(cleanSessionData);
+    let weatherData = await fetch(apiRequest)
+    let data = weatherData.json();
+    return data;
+}
 
 router.post("/booking", (req,res) => {
     //find the username from the cookie
