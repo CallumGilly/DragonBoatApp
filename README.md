@@ -1,5 +1,5 @@
 # DragonBoatApp
-An application to help with sceduling training and loading the dragon boat.
+An application to help with scheduling training and loading the dragon boat.
 
 ## Reasoning
 
