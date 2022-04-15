@@ -29,6 +29,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 //Forward requests made to / to the routes module
 app.use(`/`, routes);
 
+//Handle 404 page not found
 app.all(`*`, (req,res) => {
     res.render(`errorpage`, {errorList: {errorCode: 404, Description: "Page not found"}});
 })
