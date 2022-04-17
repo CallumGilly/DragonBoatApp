@@ -275,22 +275,25 @@ router.get("/booking", (req,res) => {
 
 router.patch("/booking", (req,res) => {
     checkUsernameCookie(req.signedCookies.username,0, (cookieData) => {
-        const sqlStatement = "SELECT * FROM ((((sessiontable INNER JOIN sessionlink ON sessiontable.sessionID=sessionlink.sessionID) INNER JOIN boatlink ON boatlink.sessionID=sessiontable.sessionID) INNER JOIN boat ON boat.boatID=boatlink.boatID) INNER JOIN paddlertable ON sessionlink.username=paddlertable.username) INNER JOIN location ON sessiontable.locationName = location.locationName WHERE sessionlink.sessionID=?"
-        db.query(sqlStatement, [req.body.sessionID], (err,results) => {
+        const paddlerSqlStatement = "SELECT * FROM ((((sessiontable INNER JOIN sessionlink ON sessiontable.sessionID=sessionlink.sessionID) INNER JOIN boatlink ON boatlink.sessionID=sessiontable.sessionID) INNER JOIN boat ON boat.boatID=boatlink.boatID) INNER JOIN paddlertable ON sessionlink.username=paddlertable.username) INNER JOIN location ON sessiontable.locationName = location.locationName WHERE sessionlink.sessionID=?"
+        db.query(paddlerSqlStatement, [req.body.sessionID], (err,results) => {
             if (err) {
                 throw err;
             }
-            getWeather(results[0].longitude,results[0].latitude).then(myData => {
-                let index = -1;
-                for (var x = 0; x < myData.daily.time.length; x++) {
-                    let theDate = new Date(myData.daily.time[x]);
-                    if (theDate.getDate() == results[0].sessionDate.getDate() && theDate.getMonth() == results[0].sessionDate.getMonth() && theDate.getFullYear() == results[0].sessionDate.getFullYear()) {
-                        index = x;
+            const dataSqlStatement = "SELECT longitude, latitude, sessionDate FROM sessiontable INNER JOIN location ON sessiontable.locationName = location.locationName WHERE sessiontable.sessionID=?"
+            db.query(dataSqlStatement, [req.body.sessionID], (err,result) => {
+                getWeather(result[0].longitude,result[0].latitude).then(myData => {
+                    let index = -1;
+                    for (var x = 0; x < myData.daily.time.length; x++) {
+                        let theDate = new Date(myData.daily.time[x]);
+                        if (theDate.getDate() == result[0].sessionDate.getDate() && theDate.getMonth() == result[0].sessionDate.getMonth() && theDate.getFullYear() == result[0].sessionDate.getFullYear()) {
+                            index = x;
+                        }
+                        
                     }
-                    
-                }
-                res.send({sessionData: results, username: cookieData.result.username, weatherData: myData, weatherPos: index});                
-            });
+                    res.send({sessionData: results, username: cookieData.result.username, weatherData: myData, weatherPos: index});                
+                });
+            })
         });
     });
 });
