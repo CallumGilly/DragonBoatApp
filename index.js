@@ -1,6 +1,6 @@
 //Main code file
 //Created by Callum Gilchrist
-// Require needed library's
+// Require needed library's for express
 const express = require(`express`);
 const ejs = require(`ejs`);
 const cookieParser = require(`cookie-parser`);
